@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './register.css';
 
 export default function Register() {
@@ -7,6 +7,8 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -30,8 +32,7 @@ export default function Register() {
   
       if (response.ok) {
         const data = await response.json();
-        alert('Registration successful!');
-        console.log(data);
+        navigate('/login');
       } else {
         const errorData = await response.json();
         alert('Registration failed: ' + (errorData.error || 'Unknown error'));

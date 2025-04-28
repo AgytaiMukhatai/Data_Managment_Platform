@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './login.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -25,8 +27,7 @@ export default function Login() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('access_token', data.access_token);  // Store the token
-        alert('Login successful!');
-        // Optionally redirect to another page
+        navigate('/dashboard');
       } else {
         const errorData = await response.json();
         alert('Login failed: ' + (errorData.error || 'Unknown error'));
