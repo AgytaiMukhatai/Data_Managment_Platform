@@ -5,6 +5,9 @@ from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
 
 # Register
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+
 @api_view(['POST'])
 def register_general_user(request):
     username = request.data.get('username')
@@ -20,10 +23,17 @@ def register_general_user(request):
     if GeneralUser.objects.filter(email=email).exists():
         return Response({'error': 'Email already exists'}, status=400)
 
+    # Validate the password
+    try:
+        validate_password(password)
+    except ValidationError as e:
+        return Response({'error': e.messages[0]}, status=400)
+
+    # Create the user
     user = GeneralUser.objects.create(
         username=username,
         email=email,
-        password=make_password(password) # Hashing
+        password=make_password(password)  # Hashing
     )
 
     return Response({'message': 'GeneralUser created successfully'})
