@@ -1,0 +1,27 @@
+/* datasets.css */
+.datasets-page {
+    padding: 30px;
+  }
+  
+  .datasets-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+  }
+  
+  .upload-btn {
+    background-color: #2ecc71;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .upload-btn:hover {
+    background-color: #27ae60;
+  }
+  

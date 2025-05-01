@@ -1,22 +1,31 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './register.css';
 
 export default function Register() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const navigate = useNavigate();
 
-  const handleRegister = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    const { username, email, password, confirmPassword } = formData;
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      setError('Passwords do not match!');
       return;
     }
-  
+
     try {
       const response = await fetch('http://localhost:8000/api/register/', {
         method: 'POST',
@@ -24,23 +33,30 @@ export default function Register() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: username,
-          email: email,
-          password: password,
+          username,
+          email,
+          password,
         }),
       });
-  
+
       if (response.ok) {
-        const data = await response.json();
-        navigate('/login');
+        setSuccess('Registration successful! Redirecting to login...');
+        setTimeout(() => navigate('/login'), 2000); // Redirect after 2 seconds
       } else {
-        const errorData = await response.json();
-        alert('Registration failed: ' + (errorData.error || 'Unknown error'));
+        const data = await response.json();
+        setError(data.error || 'An error occurred. Please try again.');
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred. Please try again.');
+      setError('Network error. Please try again later.');
     }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   return (
@@ -48,40 +64,47 @@ export default function Register() {
       <div className="register-container">
         <img src="/Images/Logo-sans arriere plan.png" alt="Logo" className="register-logo" />
         <h2>Create Account</h2>
-        <form className="register-form" onSubmit={handleRegister}>
+        <form className="register-form" onSubmit={handleSubmit}>
           <input
             type="text"
+            name="username"
             placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={formData.username}
+            onChange={handleInputChange}
             required
           />
           <input
             type="email"
+            name="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={handleInputChange}
             required
           />
           <input
             type="password"
+            name="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={handleInputChange}
             required
           />
           <input
             type="password"
+            name="confirmPassword"
             placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
             required
           />
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {success && <p style={{ color: 'green' }}>{success}</p>}
           <button type="submit">Register</button>
         </form>
         <p className="register-footer-text">
           Already have an account? <Link to="/login">Login here</Link>
         </p>
+        
       </div>
     </div>
   );

@@ -1,26 +1,37 @@
-// src/components/Sidebar.jsx
-import './dashboard.css'; // Toujours le même fichier CSS global
+import './dashboard.css'; // On utilise le même fichier de style
 
-export default function Sidebar({ onFilter }) {
+export default function Sidebar({ activePage, setActivePage }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
         <img src="/Images/Logo-sans arriere plan.png" alt="Logo" />
       </div>
-      <div className="sidebar-title">
-        <h2>Modalities</h2>
-      </div>
       <nav className="sidebar-menu">
         <ul>
-          <li onClick={() => onFilter('All')}>All Datasets</li>
-          <li onClick={() => onFilter('Text')}>Texts</li>
-          <li onClick={() => onFilter('Image')}>Images</li>
-          <li onClick={() => onFilter('Video')}>Videos</li>
-          <li onClick={() => onFilter('Audio')}>Audios</li>
-          <li onClick={() => onFilter('Numerical')}>Numerical</li>
-          <li onClick={() => onFilter('Tabular')}>Tabular</li>
+          <li
+            className={activePage === 'profile' ? 'active' : ''}
+            onClick={() => setActivePage('profile')}
+          >
+            Profile
+          </li>
+          <li
+            className={activePage === 'datasets' ? 'active' : ''}
+            onClick={() => setActivePage('datasets')}
+          >
+            Datasets
+          </li>
+          <li
+            className={activePage === 'models' ? 'active' : ''}
+            onClick={() => setActivePage('models')}
+          >
+            Models
+          </li>
         </ul>
       </nav>
+
+      <button className="logout-btn" onClick={() => window.location.href = '/login'}>
+        Logout
+      </button>
     </aside>
   );
 }

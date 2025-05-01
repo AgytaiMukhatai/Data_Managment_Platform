@@ -1,73 +1,58 @@
-// Dashboard.jsx corrigé et PROPRE
+// src/components/Dashboard.jsx
 import { useState } from 'react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
-import UploadSection from './UploadSection';
-import DatasetTable from './DatasetTable';
-import SearchBar from './SearchBar';
-import DatasetPreview from './DatasetPreview';
+import UploadModal from './UploadModal';
+import Datasets from '../pages/Datasets';
+import Profile from '../pages/Profile';
+import Models from '../pages/Models';
 import './dashboard.css';
 
 export default function Dashboard() {
-  const [allDatasets, setAllDatasets] = useState([]); // Tous les datasets
-  const [filteredDatasets, setFilteredDatasets] = useState([]); // Ce qui est affiché
-  const [selectedDataset, setSelectedDataset] = useState(null);
+  const [activePage, setActivePage] = useState('datasets');
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [datasets, setDatasets] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleUpload = (dataset) => {
-    const newDatasets = [...allDatasets, { ...dataset, datasetId: Date.now() }];
-    setAllDatasets(newDatasets);
-    setFilteredDatasets(newDatasets);
+  const handleUpload = (newDataset) => {
+    setDatasets(prev => [...prev, { ...newDataset, datasetId: Date.now() }]);
   };
 
-  const handleDelete = (datasetId) => {
-    const updatedDatasets = allDatasets.filter(d => d.datasetId !== datasetId);
-    setAllDatasets(updatedDatasets);
-    setFilteredDatasets(updatedDatasets);
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    // log or filter action
   };
 
-  const handleDownload = (dataset) => {
-    const url = URL.createObjectURL(dataset.file);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = dataset.title || 'dataset';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
-  const handleFilter = (type) => {
-    if (type === 'All') {
-      setFilteredDatasets(allDatasets);
-    } else {
-      const filtered = allDatasets.filter(d => d.type.toLowerCase().includes(type.toLowerCase()));
-      setFilteredDatasets(filtered);
+  const renderContent = () => {
+    switch (activePage) {
+      case 'datasets':
+        return <Datasets datasets={datasets} setDatasets={setDatasets} />;
+      case 'profile':
+        return <Profile datasets={datasets} setDatasets={setDatasets} />;
+      case 'models':
+        return <Models />;
+      default:
+        return <Datasets datasets={datasets} setDatasets={setDatasets} />;
     }
-  };
-
-  const handleSearch = (query) => {
-    const filtered = allDatasets.filter(d =>
-      d.title.toLowerCase().includes(query.toLowerCase()) ||
-      d.description.toLowerCase().includes(query.toLowerCase())
-    );
-    setFilteredDatasets(filtered);
   };
 
   return (
     <div className="dashboard-container">
-      <Sidebar onFilter={handleFilter} />
-      <main className="main-content">
-        <Topbar />
-
-        {/* Recherche + Upload */}
-        <div className="search-filter-container">
-          <SearchBar onSearch={handleSearch} />
-        </div>
-
-        <UploadSection onUpload={handleUpload} />
-        <DatasetTable datasets={filteredDatasets} onDelete={handleDelete} onDownload={handleDownload} />
-        {selectedDataset && <DatasetPreview dataset={selectedDataset} />}
-      </main>
+      <Sidebar activePage={activePage} setActivePage={setActivePage} />
+      <div className="main-section">
+        <Topbar
+          onOpenUploadModal={() => setIsUploadOpen(true)}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onSearchSubmit={handleSearchSubmit}
+        />
+        <div className="content-section">{renderContent()}</div>
+        <UploadModal
+          isOpen={isUploadOpen}
+          onClose={() => setIsUploadOpen(false)}
+          onUpload={handleUpload}
+        />
+      </div>
     </div>
   );
 }

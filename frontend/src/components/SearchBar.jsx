@@ -1,40 +1,32 @@
+// src/components/SearchBar.jsx
 import { useState } from 'react';
-import './dashboard.css';
+import './dashboard.css'; // On utilise le même CSS global
 
-export default function SearchBar({ onSearch, onFilterChange }) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState('All');
+export default function SearchBar({ onSearch }) {
+  const [query, setQuery] = useState('');
 
-  const handleSearch = () => {
-    onSearch(searchQuery);
+  const handleInputChange = (e) => {
+    const text = e.target.value;
+    setQuery(text);
+    onSearch(text); // Remonte la recherche au parent
   };
 
-  const handleFilterChange = (e) => {
-    const selectedType = e.target.value;
-    setFilterType(selectedType);
-    onFilterChange(selectedType);
+  const handleSearchClick = () => {
+    onSearch(query); // Rechercher aussi si l'utilisateur clique sur la loupe
   };
 
   return (
-    <div className="search-filter-container">
+    <div className="searchbar-container">
       <input
         type="text"
-        className="search-input"
-        placeholder="Search datasets..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search by name..."
+        value={query}
+        onChange={handleInputChange}
+        className="searchbar-input"
       />
-      <button className="search-btn" onClick={handleSearch}>Search</button>
-
-      <select className="filter-select" value={filterType} onChange={handleFilterChange}>
-        <option value="All">All Types</option>
-        <option value="Text">Text</option>
-        <option value="Image">Image</option>
-        <option value="Video">Video</option>
-        <option value="Audio">Audio</option>
-        <option value="Numerical">Numerical</option>
-        <option value="Tabular">Tabular</option>
-      </select>
+      <button className="searchbar-button" onClick={handleSearchClick}>
+        🔍
+      </button>
     </div>
   );
 }
