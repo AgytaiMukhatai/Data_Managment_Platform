@@ -13,7 +13,7 @@ export default function Login() {
     e.preventDefault();
   
     try {
-      const response = await fetch('http://localhost:8000/api/login/', {  // your Django login endpoint
+      const response = await fetch('http://localhost:8000/api/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ export default function Login() {
   
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('access_token', data.access_token);  // Store the token
+        localStorage.setItem('access_token', data.access_token);  // Access Token
         navigate('/dashboard');
       } else {
         const errorData = await response.json();
