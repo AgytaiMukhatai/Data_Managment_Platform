@@ -15,13 +15,13 @@ def register_general_user(request):
     password = request.data.get('password')
 
     if not username or not email or not password:
-        return Response({'error': 'All fields are required'}, status=400)
+        return Response({'error': 'All fields are required.'}, status=400)
 
     if GeneralUser.objects.filter(username=username).exists():
-        return Response({'error': 'Username already exists'}, status=400)
+        return Response({'error': 'Username already exists.'}, status=400)
     
     if GeneralUser.objects.filter(email=email).exists():
-        return Response({'error': 'Email already exists'}, status=400)
+        return Response({'error': 'Email already exists.'}, status=400)
 
     # Validate the password
     try:
@@ -36,7 +36,7 @@ def register_general_user(request):
         password=make_password(password)  # Hashing
     )
 
-    return Response({'message': 'GeneralUser created successfully'})
+    return Response({'message': 'GeneralUser created successfully.'})
 
 # Login
 @api_view(['POST'])
@@ -47,7 +47,7 @@ def login_user(request):
     try:
         user = GeneralUser.objects.get(email=email)
     except GeneralUser.DoesNotExist:
-        return Response({'error': 'Invalid credentials'}, status=400)
+        return Response({'error': 'Incorrect email or password.'}, status=400)
 
     if check_password(password, user.password):
         # Generate JWT tokens
@@ -59,4 +59,4 @@ def login_user(request):
             'message': 'Login successful'
         })
     else:
-        return Response({'error': 'Invalid credentials'}, status=400)
+        return Response({'error': 'Incorrect email or password.'}, status=400)

@@ -6,12 +6,12 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
-
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
+    setError('');
     try {
       const response = await fetch('http://localhost:8000/api/login/', {  // your Django login endpoint
         method: 'POST',
@@ -30,7 +30,7 @@ export default function Login() {
         navigate('/dashboard');
       } else {
         const errorData = await response.json();
-        alert('Login failed: ' + (errorData.error || 'Unknown error'));
+        setError(errorData.error || 'Incorrect email or password');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -43,7 +43,7 @@ export default function Login() {
     <div className="login-page">
       <div className="login-container">
         <img src="/Images/Logo-sans arriere plan.png" alt="Logo" className="login-logo" />
-        <h2>Connexion</h2>
+        <h2>Sign in</h2>
         <form className="login-form" onSubmit={handleLogin}>
           <input
             type="email"
@@ -54,12 +54,12 @@ export default function Login() {
           />
           <input
             type="password"
-            placeholder="Mot de passe"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-
+          {error && <p style = {{color: 'red'}}>{error}</p>}
           <div className="login-options">
             <label className="remember">
               <input
@@ -72,7 +72,7 @@ export default function Login() {
             <a href="#" className="forgot">Forgot password?</a>
           </div>
 
-          <button type="submit">Se connecter</button>
+          <button type="submit">Sign in</button>
         </form>
 
         <p className="login-footer-text">
