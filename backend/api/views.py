@@ -4,6 +4,13 @@ from .models import GeneralUser
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework_simplejwt.tokens import RefreshToken
 
+# Enail sending
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, force_bytes
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+
 # Register
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -36,7 +43,7 @@ def register_general_user(request):
         password=make_password(password)  # Hashing
     )
 
-    return Response({'message': 'GeneralUser created successfully'})
+    return Response({'message': 'User created successfully'})
 
 # Login
 @api_view(['POST'])
@@ -60,3 +67,17 @@ def login_user(request):
         })
     else:
         return Response({'error': 'Invalid credentials'}, status=400)
+
+
+def send_verification_email(user):
+    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))  # Encode user ID
+    
+    verification_link = f'http://localhost:8000/verify-email/{uid}/{token}/'  # Change to your domain
+
+    subject = 'Email Verification'
+    message = render_to_string('verification_email.html', {
+        'user': user,
+        'verification_link': verification_link,
+    })
+    send_mail(subject, message, 'no-reply@yourdomain.com', [user.email])
