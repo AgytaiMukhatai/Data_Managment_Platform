@@ -1,4 +1,8 @@
 /* dashboard.css */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #2c3e50;
+}
 .dashboard-container {
   display: flex;
   height: 100vh;

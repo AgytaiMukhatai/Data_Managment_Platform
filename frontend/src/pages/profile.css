@@ -2,7 +2,9 @@
 .profile-page {
   padding: 40px;
   background-color: #f5f5f5;
-  height: 100%;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
 }
 
 .profile-page h2 {
@@ -52,36 +54,39 @@
   font-size: 16px;
 }
 
-.profile-info button {
-  background-color: #2ecc71;
-  color: white;
+
+.edit-icon {
+  background: none;
   border: none;
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  font-size: 20px;
+  color: #2c3e50;
+  align-self: flex-end;
+  margin-top: -10px;
 }
 
-.profile-info button:hover {
-  background-color: #27ae60;
+.edit-icon:hover {
+  color: #197de1;
 }
 
 /* Dataset Table */
 .profile-dataset-table {
-  width: 80%;
-  margin: 0 auto;
-  background-color: #fff;
-  padding: 30px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 30px auto 0 auto;
+  background-color: #ffffff;
+  padding: 40px;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .profile-dataset-table h3 {
   font-size: 22px;
   color: #2c3e50;
   margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
 }
 
 .profile-dataset-table table {
@@ -92,14 +97,19 @@
 .profile-dataset-table th,
 .profile-dataset-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #f0f0f0;
   text-align: left;
+  font-size: 15px;
 }
 
 .profile-dataset-table th {
   background-color: #f9f9f9;
-  font-weight: bold;
+  font-weight: 600;
   color: #2c3e50;
+}
+
+.profile-dataset-table tbody tr:hover {
+  background-color: #f7faff;
 }
 
 .profile-dataset-table button {
@@ -107,8 +117,9 @@
   border-radius: 6px;
   border: none;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 500;
   font-size: 14px;
+  transition: background-color 0.2s ease;
 }
 
 .profile-dataset-table .download-btn {
@@ -128,4 +139,126 @@
 
 .profile-dataset-table .delete-btn:hover {
   background-color: #c0392b;
+}
+.profile-top button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #197de1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.profile-top button:hover {
+  background-color: #0056b3;
+}
+
+
+/* New Profile Layout Styles */
+.profile-container {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.profile-left {
+  width: 250px;
+  text-align: center;
+}
+
+.profile-left .profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #e6e6e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: #bbb;
+  margin: 0 auto 15px;
+  border: 2px solid #ccc;
+  font-family: "Segoe UI Symbol", "Arial", sans-serif;
+}
+
+.profile-left h3 {
+  margin: 10px 0 5px;
+  font-size: 20px;
+  color: #2c3e50;
+}
+
+.user-role {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.user-location {
+  font-size: 14px;
+  color: #999;
+}
+
+.profile-right {
+  flex: 1;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 16px;
+  color: #333;
+}
+
+.info-row strong {
+  width: 150px;
+  color: #2c3e50;
+}
+
+.edit-icon {
+  margin-top: 20px;
+  background-color: #197de1;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.edit-icon:hover {
+  background-color: #0056b3;
+}
+
+.profile-dataset-table table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.profile-dataset-table thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.profile-dataset-table tbody {
+  display: block;
+  max-height: 300px; /* scroll threshold */
+  overflow-y: auto;
+}
+
+.profile-dataset-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
 }
