@@ -2,18 +2,25 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import GeneralUser
 from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 # Enail sending
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode, force_bytes
+from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.http import HttpResponse
 
-# Register
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
+
+def send_verification_email(user):
+    verification_link = f'http://localhost:8000/api/verify-email/{user.verification_token}/'
+
+    subject = 'Email Verification'
+    message = render_to_string('verification_email.html', {
+        'user': user,
+        'verification_link': verification_link,
+    })
+    send_mail(subject, message, 'raiymbekproject@gmail.com', [user.email])
 
 @api_view(['POST'])
 def register_general_user(request):
@@ -36,14 +43,32 @@ def register_general_user(request):
     except ValidationError as e:
         return Response({'error': e.messages[0]}, status=400)
 
-    # Create the user
+    # Creating the user but marking as inactive until email is verified
     user = GeneralUser.objects.create(
         username=username,
         email=email,
-        password=make_password(password)  # Hashing
+        password=make_password(password)
     )
+    user.is_active = False
+    user.save()
 
-    return Response({'message': 'User created successfully'})
+    # Sending verification email
+    send_verification_email(user)
+
+    return Response({'message': 'User created successfully! Please check your email to verify your account.'}, status=200)
+
+def verify_email(request, token):
+    try:
+        # Retrieve the user by the verification token
+        user = GeneralUser.objects.get(verification_token=token)
+    except GeneralUser.DoesNotExist:
+        return HttpResponse('Invalid or expired token', status=400)
+    
+    # Activate the user if the token is valid
+    user.is_active = True
+    user.save()
+
+    return HttpResponse('Email Verified', status=200)
 
 # Login
 @api_view(['POST'])
@@ -54,7 +79,7 @@ def login_user(request):
     try:
         user = GeneralUser.objects.get(email=email)
     except GeneralUser.DoesNotExist:
-        return Response({'error': 'Invalid credentials'}, status=400)
+        return Response({'error': 'Incorrect email or password.'}, status=400)
 
     if check_password(password, user.password):
         # Generate JWT tokens
@@ -67,17 +92,3 @@ def login_user(request):
         })
     else:
         return Response({'error': 'Invalid credentials'}, status=400)
-
-
-def send_verification_email(user):
-    token = default_token_generator.make_token(user)
-    uid = urlsafe_base64_encode(force_bytes(user.pk))  # Encode user ID
-    
-    verification_link = f'http://localhost:8000/verify-email/{uid}/{token}/'  # Change to your domain
-
-    subject = 'Email Verification'
-    message = render_to_string('verification_email.html', {
-        'user': user,
-        'verification_link': verification_link,
-    })
-    send_mail(subject, message, 'no-reply@yourdomain.com', [user.email])

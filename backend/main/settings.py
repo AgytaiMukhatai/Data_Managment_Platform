@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'main.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'dmp',
+        'NAME': 'DMP',
         'USER': 'postgres',
         'PASSWORD': '12345',
         'HOST': 'localhost',
@@ -150,6 +150,6 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'raiymbekproject@gmail.com'
-EMAIL_HOST_PASSWORD = 'testing@12345'
+EMAIL_HOST_PASSWORD = 'qpvs brer ivpf viad'
 
 CORS_ALLOW_ALL_ORIGINS = True
