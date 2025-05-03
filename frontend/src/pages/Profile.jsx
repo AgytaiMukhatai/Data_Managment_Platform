@@ -53,27 +53,29 @@ export default function Profile({ datasets, setDatasets }) {
 
   return (
     <div className="profile-page">
-      <h2>My Profile</h2>
+      <div className="profile-container">
+        <div className="profile-left">
+          <img
+            src={localUser.profilePic || defaultAvatar}
+            alt="Profile"
+            className="profile-avatar"
+          />
+          <h3>{localUser.name}</h3>
+          <p className="user-role">User</p>
+          <p className="user-location">{localUser.address || 'Your location'}</p>
+        </div>
 
-      <div className="profile-top">
-        <img
-          src={localUser.profilePic || defaultAvatar}
-          alt="Profile"
-          className="profile-avatar"
-        />
-        <input type="file" accept="image/*" onChange={handleFileChange} />
+        <div className="profile-right">
+          <div className="info-row"><strong>Full Name:</strong> {localUser.name}</div>
+          <div className="info-row"><strong>Nickname:</strong> {localUser.username}</div>
+          <div className="info-row"><strong>Email:</strong> {localUser.email}</div>
+          <div className="info-row"><strong>Password:</strong> ••••••••</div>
+          <div className="info-row"><strong>Address:</strong> {localUser.address || 'Not specified'}</div>
+          <button className="edit-icon" onClick={() => alert('Edit mode coming soon')}>Edit</button>
+        </div>
       </div>
-
-      <div className="profile-info">
-        <input name="name" value={localUser.name} onChange={handleChange} placeholder="Full name" />
-        <input name="username" value={localUser.username} onChange={handleChange} placeholder="Username" />
-        <input name="email" value={localUser.email} onChange={handleChange} placeholder="Email" />
-        <input name="password" type="password" value={localUser.password} onChange={handleChange} placeholder="Password" />
-        <button onClick={handleSave}>Save Changes</button>
-      </div>
-
       <div className="profile-dataset-table">
-        <h3>My Uploaded Datasets</h3>
+        <h3>Uploaded Datasets</h3>
         {datasets.length === 0 ? (
           <p>No datasets uploaded.</p>
         ) : (
@@ -106,6 +108,41 @@ export default function Profile({ datasets, setDatasets }) {
               ))}
             </tbody>
           </table>
+        )}
+      </div>
+      <div className="profile-dataset-table">
+        <h3>Liked Datasets</h3>
+        {localUser.likedDatasets && localUser.likedDatasets.length > 0 ? (
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Size</th>
+                <th>Type</th>
+                <th>Owner</th>
+                <th>Uploaded</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {localUser.likedDatasets.map(ds => (
+                <tr key={ds.datasetId}>
+                  <td>{ds.title}</td>
+                  <td>{ds.description}</td>
+                  <td>{ds.size}</td>
+                  <td>{ds.type}</td>
+                  <td>{ds.owner}</td>
+                  <td>{ds.uploadDate}</td>
+                  <td>
+                    <button className="download-btn" onClick={() => handleDownload(ds)}>Download</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No liked datasets.</p>
         )}
       </div>
     </div>
