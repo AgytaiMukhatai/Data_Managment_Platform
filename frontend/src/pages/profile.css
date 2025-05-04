@@ -262,3 +262,22 @@
   width: 100%;
   table-layout: fixed;
 }
+
+.action-icons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.action-icon {
+  width: 24px;
+  height: 24px;
+}

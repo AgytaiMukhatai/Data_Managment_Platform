@@ -7,7 +7,6 @@ export default function Landing() {
       <header className="header">
         <div className="logo">
           <img src="/Images/Logo-sans arriere plan.png" alt="Logo" />
-          <h1>Web-based Data Management for AI</h1>
         </div>
         <p className="intro-text">
           A platform to manage datasets, perform analytic, and integrate machine learning models
@@ -17,11 +16,11 @@ export default function Landing() {
 
       <section className="features">
         <div className="feature">
-          <img src="/Images/Vizualisation.png" alt="Visualization" />
+          <img src="Images/Visualization.png" alt="Visualization" />
           <p>Visualization</p>
         </div>
         <div className="feature">
-          <img src="/Images/analys.jpg" alt="Analysis" />
+          <img src="Images/analysis.png" alt="Analysis" />
           <p>Analysis</p>
         </div>
         <div className="feature">
@@ -33,9 +32,9 @@ export default function Landing() {
       <footer className="footer">
         <p>Contact: team@AI-datamangement-platform.com</p>
         <div className="socials">
-          <a href="#"><img src="/Images/Lindkelind.png" alt="LinkedIn" />LinkedIn</a>
-          <a href="#"><img src="/Images/GitHub.png" alt="GitHub" />GitHub</a>
-          <a href="#"><img src="/Images/Twitter.png" alt="Twitter" />Twitter</a>
+          <a href="#"><img src="/Images/linkedin.png" alt="LinkedIn" />LinkedIn</a>
+          <a href="#"><img src="/Images/github (1).png" alt="GitHub" />GitHub</a>
+          <a href="#"><img src="/Images/twitter (1).png" alt="Twitter" />Twitter</a>
         </div>
       </footer>
     </div>

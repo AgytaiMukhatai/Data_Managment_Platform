@@ -5,9 +5,17 @@
   
   .datasets-header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
     margin-bottom: 30px;
+  }
+
+  .search-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
   }
   
   .upload-btn {

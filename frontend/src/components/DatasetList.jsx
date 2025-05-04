@@ -4,7 +4,7 @@ import './dashboard.css';
 export default function DatasetList({ datasets, onDownload }) {
   return (
     <section className="dataset-list-section">
-      <h2>Your Datasets</h2>
+      <h2>Datasets</h2>
       <div className="dataset-list">
         {datasets.length === 0 ? (
           <p>No datasets uploaded yet.</p>

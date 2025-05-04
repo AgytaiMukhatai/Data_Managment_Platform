@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import './profile.css';
-import defaultAvatar from '/Images/userImage.jpeg';
+import defaultAvatar from '/Images/user (1).png';
 
 export default function Profile({ datasets, setDatasets }) {
   const { user, setUser } = useContext(UserContext);
@@ -101,8 +101,14 @@ export default function Profile({ datasets, setDatasets }) {
                   <td>{ds.owner}</td>
                   <td>{ds.uploadDate}</td>
                   <td>
-                    <button className="download-btn" onClick={() => handleDownload(ds)}>Download</button>
-                    <button className="delete-btn" onClick={() => handleDelete(ds.datasetId)}>Delete</button>
+                    <div className="action-icons">
+                      <button onClick={() => handleDownload(ds)} className="icon-btn">
+                        <img src="/Images/dowload (1).png" alt="Download" className="action-icon" />
+                      </button>
+                      <button onClick={() => handleDelete(ds.datasetId)} className="icon-btn">
+                        <img src="/Images/delete.png" alt="Delete" className="action-icon" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -135,7 +141,7 @@ export default function Profile({ datasets, setDatasets }) {
                   <td>{ds.owner}</td>
                   <td>{ds.uploadDate}</td>
                   <td>
-                    <button className="download-btn" onClick={() => handleDownload(ds)}>Download</button>
+                    <button className="download-btn" onClick={() => handleDownload(ds)}><img src="/Images/dowload (1).png" alt="Download" className="action-icon"/></button>
                   </td>
                 </tr>
               ))}
