@@ -20,12 +20,6 @@ export default function Sidebar({ activePage, setActivePage }) {
           >
             Datasets
           </li>
-          <li
-            className={activePage === 'models' ? 'active' : ''}
-            onClick={() => setActivePage('models')}
-          >
-            Models
-          </li>
         </ul>
       </nav>
 

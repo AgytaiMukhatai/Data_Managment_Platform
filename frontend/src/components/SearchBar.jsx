@@ -1,5 +1,6 @@
 // src/components/SearchBar.jsx
 import { useState } from 'react';
+import { FaSearch, FaUpload } from 'react-icons/fa';
 import './dashboard.css'; // On utilise le même CSS global
 
 export default function SearchBar({ onSearch }) {
@@ -16,17 +17,23 @@ export default function SearchBar({ onSearch }) {
   };
 
   return (
-    <div className="searchbar-container">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSearchClick();
+      }}
+      className="searchbar-container"
+    >
       <input
         type="text"
-        placeholder="Search by name..."
+        placeholder="Search datasets..."
         value={query}
         onChange={handleInputChange}
         className="searchbar-input"
       />
-      <button className="searchbar-button" onClick={handleSearchClick}>
-        🔍
+      <button type="submit" className="searchbar-button">
+        <FaSearch />
       </button>
-    </div>
+    </form>
   );
 }

@@ -1,11 +1,9 @@
 // src/components/Dashboard.jsx
 import { useState } from 'react';
 import Sidebar from './Sidebar';
-import Topbar from './Topbar';
 import UploadModal from './UploadModal';
 import Datasets from '../pages/Datasets';
 import Profile from '../pages/Profile';
-import Models from '../pages/Models';
 import './dashboard.css';
 
 export default function Dashboard() {
@@ -40,13 +38,9 @@ export default function Dashboard() {
     <div className="dashboard-container">
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
       <div className="main-section">
-        <Topbar
-          onOpenUploadModal={() => setIsUploadOpen(true)}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          onSearchSubmit={handleSearchSubmit}
-        />
         <div className="content-section">{renderContent()}</div>
+        
+
         <UploadModal
           isOpen={isUploadOpen}
           onClose={() => setIsUploadOpen(false)}
