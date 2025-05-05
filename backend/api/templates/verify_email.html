@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'api/css/verify_email.css' %}">
+    {% csrf_token %}
+    <script>
+        function verifyEmail() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const token = "{{ token }}";  // This will be rendered with the actual token from Django
+            
+            // Send an AJAX request to verify the email using POST
+            fetch(`/api/confirm-email/${token}/`, {
+                method: 'POST',  // Using POST to verify the email
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken, 
+                },
+                body: JSON.stringify({
+                    token: token  // Send the token in the request body
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // If the response is not OK, throw an error
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();  // Parse the response as JSON
+            })
+            .then(data => {
+                if (data.message === "Email Verified") {
+                    // Redirect to the login page if email is verified
+                    window.location.href = "http://localhost:5173/login";
+                } else {
+                    alert('Error verifying email: ' + data.message);
+                }
+            })
+            .catch(error => {
+                // Handle any errors that occur during the request
+                console.error('Error:', error);
+                alert('There was an error verifying your email. Please try again.');
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Hello {{ user.username }}, </h1>
+    <p>Your email is almost verified. Click the button below.</p>
+    <button onclick="verifyEmail()">Verify Your Email</button>
+</body>
+</html>

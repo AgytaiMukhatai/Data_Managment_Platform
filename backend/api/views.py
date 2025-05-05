@@ -1,13 +1,13 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import GeneralUser
+from django.shortcuts import render
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 # Enail sending
-from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
@@ -20,7 +20,14 @@ def send_verification_email(user):
         'user': user,
         'verification_link': verification_link,
     })
-    send_mail(subject, message, 'raiymbekproject@gmail.com', [user.email])
+    send_mail(
+        subject,
+        '',  # Leave the plain text body empty because we're using HTML
+        'raiymbekproject@gmail.com',  # Your "From" email address
+        [user.email],  # Recipient email
+        fail_silently=False,
+        html_message=message,  # This is the HTML content of the email
+    )
 
 @api_view(['POST'])
 def register_general_user(request):
@@ -59,16 +66,24 @@ def register_general_user(request):
 
 def verify_email(request, token):
     try:
-        # Retrieve the user by the verification token
         user = GeneralUser.objects.get(verification_token=token)
     except GeneralUser.DoesNotExist:
-        return HttpResponse('Invalid or expired token', status=400)
-    
+        return Response({'message': 'Invalid or expired token'}, status=400)
+    return render(request, 'verify_email.html', {'token': token, 'user': user})
+
+@api_view(['POST'])
+def confirm_email(request, token):
+    try:
+        user = GeneralUser.objects.get(verification_token=token)
+    except GeneralUser.DoesNotExist:
+        return Response({'message': 'Invalid or expired token'}, status=400)
+
     # Activate the user if the token is valid
     user.is_active = True
     user.save()
 
-    return HttpResponse('Email Verified', status=200)
+    return Response({'message': 'Email Verified'}, status=200)
+
 
 # Login
 @api_view(['POST'])
