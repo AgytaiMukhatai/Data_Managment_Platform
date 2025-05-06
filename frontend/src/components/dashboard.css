@@ -8,16 +8,18 @@ body {
 }
 .dashboard-container {
   display: flex;
-  flex-direction: column;
   min-height: 100vh;
 }
 
+
 .main-section {
+  margin-left: 300px; /* correspond à la largeur de la sidebar */
   flex: 1;
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
 }
+
 
 .content-section {
   flex: 1;
@@ -27,16 +29,21 @@ body {
 /* Sidebar css */
 /* Sidebar css */
 .sidebar {
+  position: fixed; /* fixée à gauche */
+  top: 0;
+  left: 0;
   width: 300px;
   background-color: white;
   border-right: 1px solid #ddd;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 10px; /* <-- On réduit ici au lieu de 20px */
+  padding-top: 10px;
   height: 100vh;
-  box-sizing: border-box; /* Important pour que tout rentre bien */
+  box-sizing: border-box;
+  z-index: 1000; /* au-dessus du reste */
 }
+
 
 .sidebar-logo {
   margin-top: -70px; /* <-- On force encore le logo à monter */
@@ -167,7 +174,7 @@ body {
 .upload-form input[type="text"],
 .upload-form textarea,
 .upload-form input[type="file"] {
-  width: 100%;
+  width: 95%;
   margin-bottom: 15px;
   padding: 10px;
   border-radius: 8px;
