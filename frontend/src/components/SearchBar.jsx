@@ -1,19 +1,19 @@
 // src/components/SearchBar.jsx
 import { useState } from 'react';
 import { FaSearch, FaUpload } from 'react-icons/fa';
-import './dashboard.css'; // On utilise le même CSS global
+import './dashboard.css';
 
-export default function SearchBar({ onSearch }) {
+export default function SearchBar({ onSearch, onOpenUploadModal }) {
   const [query, setQuery] = useState('');
 
   const handleInputChange = (e) => {
     const text = e.target.value;
     setQuery(text);
-    onSearch(text); // Remonte la recherche au parent
+    onSearch(text);
   };
 
   const handleSearchClick = () => {
-    onSearch(query); // Rechercher aussi si l'utilisateur clique sur la loupe
+    onSearch(query);
   };
 
   return (
@@ -31,8 +31,19 @@ export default function SearchBar({ onSearch }) {
         onChange={handleInputChange}
         className="searchbar-input"
       />
+
       <button type="submit" className="searchbar-button">
         <FaSearch />
+      </button>
+
+      <button
+        type="button"
+        className="upload-btn"
+        style={{ marginLeft: '10px' }}
+        onClick={onOpenUploadModal}
+      >
+        <FaUpload style={{ marginRight: '6px' }} />
+        Upload
       </button>
     </form>
   );

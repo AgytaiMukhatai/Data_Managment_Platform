@@ -1,3 +1,4 @@
+// src/pages/Profile.jsx
 import { useContext, useState } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import './profile.css';
@@ -5,7 +6,6 @@ import defaultAvatar from '/Images/user (1).png';
 
 export default function Profile({ datasets, setDatasets }) {
   const { user, setUser } = useContext(UserContext);
-
   const [localUser, setLocalUser] = useState(user);
 
   const handleFileChange = (e) => {
@@ -15,7 +15,7 @@ export default function Profile({ datasets, setDatasets }) {
       reader.onload = () => {
         const updatedUser = { ...localUser, profilePic: reader.result };
         setLocalUser(updatedUser);
-        setUser(updatedUser);  // Mise à jour globale
+        setUser(updatedUser);
       };
       reader.readAsDataURL(file);
     }
@@ -28,7 +28,7 @@ export default function Profile({ datasets, setDatasets }) {
   };
 
   const handleSave = () => {
-    setUser(localUser); // Appliquer les changements globalement
+    setUser(localUser);
     alert('Profile updated successfully!');
   };
 
@@ -63,17 +63,19 @@ export default function Profile({ datasets, setDatasets }) {
           <h3>{localUser.name}</h3>
           <p className="user-role">User</p>
           <p className="user-location">{localUser.address || 'Your location'}</p>
+          <input type="file" onChange={handleFileChange} />
         </div>
 
         <div className="profile-right">
           <div className="info-row"><strong>Full Name:</strong> {localUser.name}</div>
-          <div className="info-row"><strong>Nickname:</strong> {localUser.username}</div>
+          <div className="info-row"><strong>Username:</strong> {localUser.username}</div>
           <div className="info-row"><strong>Email:</strong> {localUser.email}</div>
           <div className="info-row"><strong>Password:</strong> ••••••••</div>
           <div className="info-row"><strong>Address:</strong> {localUser.address || 'Not specified'}</div>
-          <button className="edit-icon" onClick={() => alert('Edit mode coming soon')}>Edit</button>
+          <button className="edit-icon" onClick={handleSave}>Edit</button>
         </div>
       </div>
+
       <div className="profile-dataset-table">
         <h3>Uploaded Datasets</h3>
         {datasets.length === 0 ? (
@@ -101,14 +103,12 @@ export default function Profile({ datasets, setDatasets }) {
                   <td>{ds.owner}</td>
                   <td>{ds.uploadDate}</td>
                   <td>
-                    <div className="action-icons">
-                      <button onClick={() => handleDownload(ds)} className="icon-btn">
-                        <img src="/Images/dowload (1).png" alt="Download" className="action-icon" />
-                      </button>
-                      <button onClick={() => handleDelete(ds.datasetId)} className="icon-btn">
-                        <img src="/Images/delete.png" alt="Delete" className="action-icon" />
-                      </button>
-                    </div>
+                    <button className="icon-btn" onClick={() => handleDownload(ds)}>
+                      <img src="/Images/dowload (1).png" alt="Download" className="action-icon" />
+                    </button>
+                    <button className="icon-btn" onClick={() => handleDelete(ds.datasetId)}>
+                      <img src="/Images/delete.png" alt="Delete" className="action-icon" />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -116,9 +116,10 @@ export default function Profile({ datasets, setDatasets }) {
           </table>
         )}
       </div>
+
       <div className="profile-dataset-table">
         <h3>Liked Datasets</h3>
-        {localUser.likedDatasets && localUser.likedDatasets.length > 0 ? (
+        {localUser.likedDatasets?.length > 0 ? (
           <table>
             <thead>
               <tr>
@@ -141,7 +142,9 @@ export default function Profile({ datasets, setDatasets }) {
                   <td>{ds.owner}</td>
                   <td>{ds.uploadDate}</td>
                   <td>
-                    <button className="download-btn" onClick={() => handleDownload(ds)}><img src="/Images/dowload (1).png" alt="Download" className="action-icon"/></button>
+                    <button className="icon-btn" onClick={() => handleDownload(ds)}>
+                      <img src="/Images/dowload (1).png" alt="Download" className="action-icon" />
+                    </button>
                   </td>
                 </tr>
               ))}

@@ -10,27 +10,30 @@ export default function Dashboard() {
   const [activePage, setActivePage] = useState('datasets');
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [datasets, setDatasets] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const handleUpload = (newDataset) => {
     setDatasets(prev => [...prev, { ...newDataset, datasetId: Date.now() }]);
   };
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    // log or filter action
-  };
-
   const renderContent = () => {
     switch (activePage) {
       case 'datasets':
-        return <Datasets datasets={datasets} setDatasets={setDatasets} />;
+        return (
+          <Datasets
+            datasets={datasets}
+            setDatasets={setDatasets}
+            onOpenUploadModal={() => setIsUploadOpen(true)}
+          />
+        );
       case 'profile':
-        return <Profile datasets={datasets} setDatasets={setDatasets} />;
-      case 'models':
-        return <Models />;
+        return (
+          <Profile
+            datasets={datasets}
+            setDatasets={setDatasets}
+          />
+        );
       default:
-        return <Datasets datasets={datasets} setDatasets={setDatasets} />;
+        return null;
     }
   };
 
@@ -38,9 +41,9 @@ export default function Dashboard() {
     <div className="dashboard-container">
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
       <div className="main-section">
-        <div className="content-section">{renderContent()}</div>
-        
-
+        <div className="content-section">
+          {renderContent()}
+        </div>
         <UploadModal
           isOpen={isUploadOpen}
           onClose={() => setIsUploadOpen(false)}

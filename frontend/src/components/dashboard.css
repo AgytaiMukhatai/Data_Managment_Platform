@@ -397,6 +397,29 @@ body {
 .dataset-actions .download-btn:hover {
   background-color: #27ae60;
 }
+.like-btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  background-color: #3498db;
+  color: white;
+}
+
+.like-btn:hover {
+  background-color: #2980b9;
+}
+
+.like-btn.liked {
+  background-color: #e74c3c;
+}
+
+.like-btn.liked:hover {
+  background-color: #c0392b;
+}
+
 
 
 @media (min-width: 768px) {

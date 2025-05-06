@@ -1,23 +1,16 @@
 // src/pages/Datasets.jsx
+import { useState } from 'react';
 import SearchBar from '../components/SearchBar';
 import FilterDropdown from '../components/FilterDropdown';
 import ModalitiesFilter from '../components/ModalitiesFilter';
 import SizeSlider from '../components/SizeSlider';
 import DatasetList from '../components/DatasetList';
-import UploadModal from '../components/UploadModal';
-import { useState } from 'react';
 import './datasets.css';
 
-export default function Datasets() {
-  const [datasets, setDatasets] = useState([]);
-  const [showUpload, setShowUpload] = useState(false);
+export default function Datasets({ datasets, setDatasets, onOpenUploadModal }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedModality, setSelectedModality] = useState('All');
   const [sizeRange, setSizeRange] = useState(300);
-
-  const handleUpload = (dataset) => {
-    setDatasets(prev => [...prev, { ...dataset, datasetId: Date.now() }]);
-  };
 
   const handleSearch = (query) => {
     setSearchQuery(query.toLowerCase());
@@ -31,13 +24,6 @@ export default function Datasets() {
     setSizeRange(value);
   };
 
-  const filteredDatasets = datasets.filter(dataset => {
-    const matchesSearch = dataset.title.toLowerCase().includes(searchQuery);
-    const matchesModality = selectedModality === 'All' || dataset.type.toLowerCase().includes(selectedModality.toLowerCase());
-    const matchesSize = parseFloat(dataset.size) <= sizeRange;
-    return matchesSearch && matchesModality && matchesSize;
-  });
-
   const handleDownload = (dataset) => {
     const url = URL.createObjectURL(dataset.file);
     const link = document.createElement('a');
@@ -49,20 +35,35 @@ export default function Datasets() {
     URL.revokeObjectURL(url);
   };
 
+  const filteredDatasets = datasets.filter(dataset => {
+    const matchesSearch = dataset.title.toLowerCase().includes(searchQuery);
+    const matchesModality =
+      selectedModality === 'All' ||
+      dataset.type.toLowerCase().includes(selectedModality.toLowerCase());
+    const matchesSize = parseFloat(dataset.size) <= sizeRange;
+    return matchesSearch && matchesModality && matchesSize;
+  });
+
   return (
     <div className="datasets-page">
       <div className="datasets-header">
-        <SearchBar onSearch={handleSearch} />
-        {/* <button className="upload-btn" onClick={() => setShowUpload(true)}>Upload</button> */}
+        <SearchBar
+          onSearch={handleSearch}
+          onOpenUploadModal={onOpenUploadModal}
+        />
         <FilterDropdown onFilter={handleFilter} />
       </div>
 
-      <ModalitiesFilter onFilter={handleFilter} />
-      <SizeSlider onChange={handleSizeChange} value={sizeRange} />
+      <div className="filter-row">
+        <div className="modalities-column">
+          <ModalitiesFilter onModalitySelect={handleFilter} />
+        </div>
+        <div className="size-column">
+          <SizeSlider onChange={handleSizeChange} value={sizeRange} />
+        </div>
+      </div>
 
       <DatasetList datasets={filteredDatasets} onDownload={handleDownload} />
-
-      {showUpload && <UploadModal onClose={() => setShowUpload(false)} onUpload={handleUpload} />}
     </div>
   );
 }

@@ -1,7 +1,31 @@
-// src/components/DatasetList.jsx
+import { useState, useContext } from 'react';
+import { UserContext } from '../contexts/UserContext';
 import './dashboard.css';
 
 export default function DatasetList({ datasets, onDownload }) {
+  const { user, setUser } = useContext(UserContext);
+  const [liked, setLiked] = useState(() =>
+    (user.likedDatasets || []).reduce((acc, ds) => {
+      acc[ds.datasetId] = true;
+      return acc;
+    }, {})
+  );
+
+  const toggleLike = (dataset) => {
+    const isLiked = liked[dataset.datasetId];
+
+    setLiked((prev) => ({
+      ...prev,
+      [dataset.datasetId]: !isLiked,
+    }));
+
+    const updatedLikes = isLiked
+      ? user.likedDatasets.filter((ds) => ds.datasetId !== dataset.datasetId)
+      : [...(user.likedDatasets || []), dataset];
+
+    setUser({ ...user, likedDatasets: updatedLikes });
+  };
+
   return (
     <section className="dataset-list-section">
       <h2>Datasets</h2>
@@ -22,7 +46,15 @@ export default function DatasetList({ datasets, onDownload }) {
                 </div>
               </div>
               <div className="dataset-actions">
-                <button onClick={() => onDownload(dataset)} className="download-btn">Download</button>
+                <button onClick={() => onDownload(dataset)} className="download-btn">
+                  Download
+                </button>
+                <button
+                  className={`like-btn ${liked[dataset.datasetId] ? 'liked' : ''}`}
+                  onClick={() => toggleLike(dataset)}
+                >
+                  {liked[dataset.datasetId] ? '♥ Liked' : '♡ Like'}
+                </button>
               </div>
             </div>
           ))
