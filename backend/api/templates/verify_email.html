@@ -10,36 +10,32 @@
     <script>
         function verifyEmail() {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            const token = "{{ token }}";  // This will be rendered with the actual token from Django
+            const token = "{{ token }}";
             
-            // Send an AJAX request to verify the email using POST
             fetch(`/api/confirm-email/${token}/`, {
-                method: 'POST',  // Using POST to verify the email
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': csrfToken, 
                 },
                 body: JSON.stringify({
-                    token: token  // Send the token in the request body
+                    token: token
                 }),
             })
             .then(response => {
                 if (!response.ok) {
-                    // If the response is not OK, throw an error
                     throw new Error('Network response was not ok');
                 }
-                return response.json();  // Parse the response as JSON
+                return response.json();
             })
             .then(data => {
                 if (data.message === "Email Verified") {
-                    // Redirect to the login page if email is verified
                     window.location.href = "http://localhost:5173/login";
                 } else {
                     alert('Error verifying email: ' + data.message);
                 }
             })
             .catch(error => {
-                // Handle any errors that occur during the request
                 console.error('Error:', error);
                 alert('There was an error verifying your email. Please try again.');
             });
