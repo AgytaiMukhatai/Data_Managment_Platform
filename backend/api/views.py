@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import render, redirect
 
 # Enail sending
 from django.core.mail import send_mail
@@ -54,19 +55,28 @@ def register_general_user(request):
     user = GeneralUser.objects.create(
         username=username,
         email=email,
-        password=make_password(password)
+        password=make_password(password),
+        is_active=False,
     )
-    user.is_active = False
-    user.save()
 
-    # Sending verification email
     send_verification_email(user)
+
 
     return Response({'message': 'User created successfully! Please check your email to verify your account.'}, status=200)
 
+@api_view(['GET'])
 def verify_email(request, token):
     try:
         user = GeneralUser.objects.get(verification_token=token)
+        if user.is_active:
+            return redirect('http://localhost:5173/login?verified=true')
+        user.is_active = True
+        user.save()
+        # Redirect to a success page or render a template
+        return redirect('http://localhost:5173/login?verified=true')
+    except GeneralUser.MultipleObjectsReturned:
+        # Handle the case where multiple users are found with the same token
+        return Response({'message': 'Multiple users found with this token'}, status=400)
     except GeneralUser.DoesNotExist:
         return Response({'message': 'Invalid or expired token'}, status=400)
     return render(request, 'verify_email.html', {'token': token, 'user': user})
@@ -93,17 +103,16 @@ def login_user(request):
 
     try:
         user = GeneralUser.objects.get(email=email)
+        if not user.is_active:
+            return Response({'error': 'Please verify your email adress before logging in'}, status=400)
+    
+        if check_password(password, user.password):
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+            }, status=200)
+        else:
+            return Response({'error': 'Invalid credentials'}, status=401)
     except GeneralUser.DoesNotExist:
-        return Response({'error': 'Incorrect email or password.'}, status=400)
-
-    if check_password(password, user.password):
-        # Generate JWT tokens
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
-
-        return Response({
-            'access_token': access_token,
-            'message': 'Login successful'
-        })
-    else:
-        return Response({'error': 'Invalid credentials'}, status=400)
+        return Response({'error': 'Invalid credentials'}, status=401)

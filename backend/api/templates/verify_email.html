@@ -30,7 +30,8 @@
             })
             .then(data => {
                 if (data.message === "Email Verified") {
-                    window.location.href = "http://localhost:5173/login";
+                    // Redirect to login page with a query parameter
+                    window.location.href = "http://localhost:5173/login?verified=true";
                 } else {
                     alert('Error verifying email: ' + data.message);
                 }
