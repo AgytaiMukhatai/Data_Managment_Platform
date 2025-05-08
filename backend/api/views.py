@@ -22,11 +22,28 @@ def send_verification_email(user):
     })
     send_mail(
         subject,
-        '',  # Leave the plain text body empty because we're using HTML
-        'raiymbekproject@gmail.com',  # Your "From" email address
-        [user.email],  # Recipient email
+        '',
+        'raiymbekproject@gmail.com',
+        [user.email],
         fail_silently=False,
-        html_message=message,  # This is the HTML content of the email
+        html_message=message,
+    )
+
+def send_password_email(user):
+    password_change_link = f'http://localhost:8000/api/password-change/{user.verification_token}/'
+
+    subject = 'Reset Password'
+    message = render_to_string('forgot_password_email.html', {
+        'user': user,
+        'password_change_link': password_change_link,
+    })
+    send_mail(
+        subject,
+        '',
+        'raiymbekproject@gmail.com',
+        [user.email],
+        fail_silently=False,
+        html_message=message,
     )
 
 @api_view(['POST'])
@@ -107,3 +124,34 @@ def login_user(request):
         })
     else:
         return Response({'error': 'Invalid credentials'}, status=400)
+
+@api_view(['POST'])
+def forgot_password(request):
+    email = request.data.get('email')
+    try:
+        user = GeneralUser.objects.get(email=email)
+        send_password_email(user)
+        return Response({'message': 'Email sended. Check your mailbox'}, status=200)
+    except GeneralUser.DoesNotExist:
+        return Response({'message': 'User with this email does not exists'}, status=400)
+
+def password_change(request, token):
+    try:
+        user = GeneralUser.objects.get(verification_token=token)
+    except GeneralUser.DoesNotExist:
+        return Response({'message': 'Invalid or expired token'}, status=400)
+    return render(request, 'password_change.html', {'token': token, 'user': user})
+
+@api_view(['POST'])
+def reset_password(request, token):
+    password = request.data.get('password')
+    token = request.data.get('token')
+    user = GeneralUser.objects.get(verification_token=token)
+    try:
+        validate_password(password)
+    except ValidationError as e:
+        return Response({'error': e.messages[0]}, status=400)
+
+    user.password = make_password(password)
+    user.save()
+    return Response({'message': 'Password changed'}, status=200)
