@@ -59,8 +59,8 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
             required
           />
           <div className="modal-buttons">
-            <button type="submit" className="upload-btn">Upload</button>
             <button type="button" className="cancel-btn" onClick={onClose}>Cancel</button>
+            <button type="submit" className="upload-btn">Upload</button>
           </div>
         </form>
       </div>
