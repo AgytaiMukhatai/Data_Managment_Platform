@@ -1,35 +1,60 @@
-// src/components/UploadModal.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './dashboard.css';
 
 export default function UploadModal({ isOpen, onClose, onUpload }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleSubmit = (e) => {
+  // Reset the error and success messages when the modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setError('');
+      setSuccess('');
+    }
+  }, [isOpen]); // This hook runs when 'isOpen' changes
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedFile) {
-      alert('Please select a file.');
+    setError('');
+    setSuccess('');
+
+    if (selectedFiles.length === 0) {
+      setError('Please select at least one file.');
       return;
     }
 
-    const newDataset = {
-      datasetId: Date.now(),
-      title,
-      description,
-      file: selectedFile,
-      uploadDate: new Date().toISOString().split('T')[0],
-      size: (selectedFile.size / 1024 / 1024).toFixed(2) + ' MB',
-      type: selectedFile.type,
-      owner: 'anonymous', // Can be replaced later with logged-in user
-    };
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    selectedFiles.forEach((file) => {
+      formData.append('files', file);
+    });
 
-    onUpload(newDataset);
-    setTitle('');
-    setDescription('');
-    setSelectedFile(null);
-    onClose();
+    try {
+      const response = await fetch('http://localhost:8000/api/upload-dataset/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSuccess('Dataset uploaded successfully!');
+        onUpload(data); // Optional callback
+        setTitle('');
+        setDescription('');
+        setSelectedFiles([]);
+        onClose();
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to upload dataset.');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError('Something went wrong. Please try again.');
+    }
   };
 
   if (!isOpen) return null;
@@ -38,7 +63,7 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
     <div className="modal-overlay">
       <div className="modal-content">
         <h2>Upload a Dataset</h2>
-        <form onSubmit={handleSubmit} className="upload-form">
+        <form className="upload-form" onSubmit={handleSubmit}>
           <input
             type="text"
             placeholder="Dataset Title"
@@ -55,12 +80,19 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
           />
           <input
             type="file"
-            onChange={(e) => setSelectedFile(e.target.files[0])}
+            multiple
+            onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
             required
           />
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {success && <p style={{ color: 'green' }}>{success}</p>}
           <div className="modal-buttons">
-            <button type="button" className="cancel-btn" onClick={onClose}>Cancel</button>
-            <button type="submit" className="upload-btn">Upload</button>
+            <button type="button" className="cancel-btn" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="upload-btn">
+              Upload
+            </button>
           </div>
         </form>
       </div>

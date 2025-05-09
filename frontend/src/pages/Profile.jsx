@@ -1,159 +1,190 @@
 // src/pages/Profile.jsx
-import { useContext, useState } from 'react';
-import { UserContext } from '../contexts/UserContext';
-import './profile.css';
-import defaultAvatar from '/Images/user (1).png';
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Sidebar from '../components/Sidebar'
+import './profile.css'
+import defaultAvatar from '/Images/user (1).png'
 
-export default function Profile({ datasets, setDatasets }) {
-  const { user, setUser } = useContext(UserContext);
-  const [localUser, setLocalUser] = useState(user);
+export default function Profile() {
+	const navigate = useNavigate()
+	const [localUser, setLocalUser] = useState({
+		name: 'Max Musterman',
+		username: 'musterman',
+		email: 'muster@gmail.com',
+		address: 'Berlin, Germany',
+		profilePic: null,
+	})
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const updatedUser = { ...localUser, profilePic: reader.result };
-        setLocalUser(updatedUser);
-        setUser(updatedUser);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+	const handleFileChange = e => {
+		const file = e.target.files[0]
+		if (file) {
+			const reader = new FileReader()
+			reader.onload = () => {
+				setLocalUser({ ...localUser, profilePic: reader.result })
+			}
+			reader.readAsDataURL(file)
+		}
+	}
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const updatedUser = { ...localUser, [name]: value };
-    setLocalUser(updatedUser);
-  };
+	const handleChange = e => {
+		const { name, value } = e.target
+		setLocalUser({ ...localUser, [name]: value })
+	}
 
-  const handleSave = () => {
-    setUser(localUser);
-    alert('Profile updated successfully!');
-  };
+	const handleSave = () => {
+		alert('Profile updated successfully!')
+	}
 
-  const handleDownload = (dataset) => {
-    const url = URL.createObjectURL(dataset.file);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = dataset.title;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+	const mockDatasets = [
+		{
+			datasetId: '1',
+			title: 'Customer Satisfaction Survey',
+			description: 'Annual customer feedback data',
+			size: '2.4 MB',
+			type: 'CSV',
+			owner: 'Max Musterman',
+			uploadDate: '2023-05-15',
+		},
+		{
+			datasetId: '2',
+			title: 'Sales Analytics 2023',
+			description: 'Quarterly sales performance data',
+			size: '3.7 MB',
+			type: 'JSON',
+			owner: 'Max Musterman',
+			uploadDate: '2023-06-22',
+		},
+	]
 
-  const handleDelete = (datasetId) => {
-    const confirm = window.confirm('Are you sure you want to delete this dataset?');
-    if (confirm) {
-      const updated = datasets.filter(ds => ds.datasetId !== datasetId);
-      setDatasets(updated);
-    }
-  };
+	return (
+		<div className='page-container'>
+			<Sidebar activePage='profile' />
 
-  return (
-    <div className="profile-page">
-      <div className="profile-container">
-        <div className="profile-left">
-          <img
-            src={localUser.profilePic || defaultAvatar}
-            alt="Profile"
-            className="profile-avatar"
-          />
-          <h3>{localUser.name}</h3>
-          <p className="user-role">User</p>
-          <p className="user-location">{localUser.address || 'Your location'}</p>
-          <input type="file" onChange={handleFileChange} />
-        </div>
+			<div className='profile-page'>
+				<section className='detail-section'>
+					<div className='container'>
+						<div className='back-button-container'>
+							<button className='back-button' onClick={() => navigate(-1)}>
+								&larr; Back
+							</button>
+						</div>
+						<h1 className='title'>User Profile</h1>
+						<p className='description'>
+							Manage your personal information and datasets
+						</p>
+					</div>
+				</section>
 
-        <div className="profile-right">
-          <div className="info-row"><strong>Full Name:</strong> {localUser.name}</div>
-          <div className="info-row"><strong>Username:</strong> {localUser.username}</div>
-          <div className="info-row"><strong>Email:</strong> {localUser.email}</div>
-          <div className="info-row"><strong>Password:</strong> ••••••••</div>
-          <div className="info-row"><strong>Address:</strong> {localUser.address || 'Not specified'}</div>
-          <button className="edit-icon" onClick={handleSave}>Edit</button>
-        </div>
-      </div>
+				<section className='detail-section'>
+					<div className='profile-container'>
+						<div className='profile-left'>
+							<img
+								src={localUser.profilePic || defaultAvatar}
+								alt='Profile'
+								className='profile-avatar'
+							/>
+							<h3>{localUser.name}</h3>
+							<p className='user-role'>User</p>
+							<p className='user-location'>{localUser.address}</p>
+							<div className='file-input-container'>
+								<label className='file-input-label'>
+									Change Profile Picture
+									<input type='file' onChange={handleFileChange} />
+								</label>
+							</div>
+						</div>
 
-      <div className="profile-dataset-table">
-        <h3>Uploaded Datasets</h3>
-        {datasets.length === 0 ? (
-          <p>No datasets uploaded.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Size</th>
-                <th>Type</th>
-                <th>Owner</th>
-                <th>Uploaded</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {datasets.map(ds => (
-                <tr key={ds.datasetId}>
-                  <td>{ds.title}</td>
-                  <td>{ds.description}</td>
-                  <td>{ds.size}</td>
-                  <td>{ds.type}</td>
-                  <td>{ds.owner}</td>
-                  <td>{ds.uploadDate}</td>
-                  <td>
-                    <button className="icon-btn" onClick={() => handleDownload(ds)}>
-                      <img src="/Images/dowload (1).png" alt="Download" className="action-icon" />
-                    </button>
-                    <button className="icon-btn" onClick={() => handleDelete(ds.datasetId)}>
-                      <img src="/Images/delete.png" alt="Delete" className="action-icon" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+						<div className='profile-right'>
+							<div className='profile-form'>
+								<div className='form-group'>
+									<label>Full Name</label>
+									<input
+										type='text'
+										name='name'
+										value={localUser.name}
+										onChange={handleChange}
+									/>
+								</div>
+								<div className='form-group'>
+									<label>Username</label>
+									<input
+										type='text'
+										name='username'
+										value={localUser.username}
+										onChange={handleChange}
+									/>
+								</div>
+								<div className='form-group'>
+									<label>Email</label>
+									<input
+										type='email'
+										name='email'
+										value={localUser.email}
+										onChange={handleChange}
+									/>
+								</div>
+								<div className='form-group'>
+									<label>Address</label>
+									<input
+										type='text'
+										name='address'
+										value={localUser.address}
+										onChange={handleChange}
+									/>
+								</div>
+								<button className='save-button' onClick={handleSave}>
+									Save Changes
+								</button>
+							</div>
+						</div>
+					</div>
+				</section>
 
-      <div className="profile-dataset-table">
-        <h3>Liked Datasets</h3>
-        {localUser.likedDatasets?.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Size</th>
-                <th>Type</th>
-                <th>Owner</th>
-                <th>Uploaded</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {localUser.likedDatasets.map(ds => (
-                <tr key={ds.datasetId}>
-                  <td>{ds.title}</td>
-                  <td>{ds.description}</td>
-                  <td>{ds.size}</td>
-                  <td>{ds.type}</td>
-                  <td>{ds.owner}</td>
-                  <td>{ds.uploadDate}</td>
-                  <td>
-                    <button className="icon-btn" onClick={() => handleDownload(ds)}>
-                      <img src="/Images/dowload (1).png" alt="Download" className="action-icon" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p>No liked datasets.</p>
-        )}
-      </div>
-    </div>
-  );
+				<section className='detail-section'>
+					<div className='container'>
+						<h2 className='title'>Your Datasets</h2>
+						<div className='profile-dataset-table'>
+							{mockDatasets.length === 0 ? (
+								<p>No datasets uploaded.</p>
+							) : (
+								<table>
+									<thead>
+										<tr>
+											<th>Title</th>
+											<th>Description</th>
+											<th>Size</th>
+											<th>Type</th>
+											<th>Uploaded</th>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										{mockDatasets.map(ds => (
+											<tr key={ds.datasetId}>
+												<td>{ds.title}</td>
+												<td>{ds.description}</td>
+												<td>{ds.size}</td>
+												<td>{ds.type}</td>
+												<td>{ds.uploadDate}</td>
+												<td className='action-buttons'>
+													<button className='action-button view'>View</button>
+													<button className='action-button download'>
+														Download
+													</button>
+													<button className='action-button delete'>
+														Delete
+													</button>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							)}
+						</div>
+					</div>
+				</section>
+			</div>
+		</div>
+	)
 }
+

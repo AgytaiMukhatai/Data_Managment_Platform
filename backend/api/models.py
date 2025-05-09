@@ -1,4 +1,5 @@
 from django.db import models
+import os
 import uuid
 
 class GeneralUser(models.Model):
@@ -15,17 +16,19 @@ class GeneralUser(models.Model):
     def __str__(self):
         return self.username
 
+def dataset_upload_to(instance, filename):
+    folder_name = instance.title.replace(" ", "_")
+    return os.path.join('datasets', folder_name, filename)
+
 class Dataset(models.Model):
-    # Foreign Key to link to the user who uploaded the dataset
-    user = models.ForeignKey(GeneralUser, on_delete=models.CASCADE, related_name='datasets')
-    name = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
     description = models.TextField()
+    upload_date = models.DateTimeField(auto_now_add=True)
     size = models.FloatField()
     dataset_type = models.CharField(max_length=50, choices=[('Text', 'Text'), ('Tabular', 'Tabular'), ('Image', 'Image'), ('Audio', 'Audio'), ('Video', 'Video')])
-    upload_date = models.DateTimeField(auto_now_add=True)
-    likes = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
-    file_link = models.URLField()
+    likes = models.IntegerField(default=0)
+    files = models.FileField(upload_to=dataset_upload_to)
 
     def __str__(self):
-        return self.name
+        return self.title

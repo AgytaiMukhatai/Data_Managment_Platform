@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 from .models import GeneralUser
 from django.shortcuts import render
 from django.contrib.auth.hashers import make_password, check_password
@@ -7,10 +8,21 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-# Enail sending
+# Email sending
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
+# Dataset view
+from .models import Dataset
+from .serializers import DatasetSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.files.storage import default_storage
+import os
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync 
 
 def send_verification_email(user):
     verification_link = f'http://localhost:8000/api/verify-email/{user.verification_token}/'
@@ -155,3 +167,48 @@ def reset_password(request, token):
     user.password = make_password(password)
     user.save()
     return Response({'message': 'Password changed'}, status=200)
+
+
+class DatasetList(APIView):
+    def get(self, request):
+        datasets = Dataset.objects.all()
+        serializer = DatasetSerializer(datasets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UploadDatasetView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        title = request.data.get('title')
+        description = request.data.get('description')
+        files = request.FILES.getlist('files') or []
+
+        if not title or not description or not files:
+            return Response(
+                {'error': 'Title, description, and at least one file are required.'},
+                status=400
+            )
+
+        # Calculate total size first
+        total_size = sum(file.size for file in files)
+        total_size_mb = total_size / (1024 * 1024)
+
+        # Save dataset with size immediately
+        dataset = Dataset.objects.create(
+            title=title,
+            description=description,
+            size=round(total_size_mb, 2),
+        )
+
+        # Save files
+        file_paths = []
+        base_path = os.path.join('datasets', dataset.title.replace(" ", "_"))
+        for file in files:
+            path = default_storage.save(os.path.join(base_path, file.name), file)
+            file_paths.append(path)
+
+        # Store first file path (if your model supports only one file field)
+        dataset.files = file_paths[0]
+        dataset.save()
+
+        return Response({'message': 'Dataset uploaded successfully!'}, status=201)
