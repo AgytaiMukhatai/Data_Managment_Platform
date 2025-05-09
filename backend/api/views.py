@@ -7,6 +7,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import render, redirect
 
 # Email sending
 from django.core.mail import send_mail
@@ -83,42 +84,37 @@ def register_general_user(request):
     user = GeneralUser.objects.create(
         username=username,
         email=email,
-        password=make_password(password)
+        password=make_password(password),
+        is_active=False,
     )
-    user.is_active = False
-    user.save()
 
-    # Sending verification email
     send_verification_email(user)
 
     return Response({'message': 'User created successfully! Please check your email to verify your account.'}, status=200)
 
+@api_view(['GET'])
 def verify_email(request, token):
     try:
         user = GeneralUser.objects.get(verification_token=token)
+        if user.is_active:
+            return redirect('http://localhost:5173/login?verified=true')
+        user.is_active = True
+        user.save()
+        # Redirect to a success page or render a template
+        return redirect('http://localhost:5173/login?verified=true')
+    except GeneralUser.MultipleObjectsReturned:
+        # Handle the case where multiple users are found with the same token
+        return Response({'message': 'Multiple users found with this token'}, status=400)
     except GeneralUser.DoesNotExist:
         return Response({'message': 'Invalid or expired token'}, status=400)
     return render(request, 'verify_email.html', {'token': token, 'user': user})
-
-@api_view(['POST'])
-def confirm_email(request, token):
-    try:
-        user = GeneralUser.objects.get(verification_token=token)
-    except GeneralUser.DoesNotExist:
-        return Response({'message': 'Invalid or expired token'}, status=400)
-
-    # Activate the user if the token is valid
-    user.is_active = True
-    user.save()
-
-    return Response({'message': 'Email Verified'}, status=200)
-
 
 # Login
 @api_view(['POST'])
 def login_user(request):
     email = request.data.get('email')
     password = request.data.get('password')
+
 
     try:
         user = GeneralUser.objects.get(email=email)

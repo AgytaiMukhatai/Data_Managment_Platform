@@ -40,8 +40,8 @@ export default function Register() {
       });
 
       if (response.ok) {
-        setSuccess('Registration successful! Redirecting to login...');
-        setTimeout(() => navigate('/login'), 2000); // Redirect after 2 seconds
+        setSuccess('Registration successful! Please verify your email.');
+        
       } else {
         const data = await response.json();
         setError(data.error || 'An error occurred. Please try again.');
