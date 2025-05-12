@@ -171,25 +171,35 @@ class DatasetList(APIView):
         serializer = DatasetSerializer(datasets, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+TABULAR_FILE_EXTENSIONS = ['csv', 'xlsx', 'json', 'tsv']
+
 class UploadDatasetView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
+    def is_valid_file_type(self, file):
+        file_extension = file.name.split('.')[-1].lower()
+        return file_extension in TABULAR_FILE_EXTENSIONS
+
     def post(self, request, *args, **kwargs):
+
+        # Extract metadata from the request
         title = request.data.get('title')
         description = request.data.get('description')
         files = request.FILES.getlist('files') or []
 
         if not title or not description or not files:
             return Response(
-                {'error': 'Title, description, and at least one file are required.'},
-                status=400
-            )
+                {'error': 'Title, description, and at least one file are required.'}, status=400)
 
-        # Calculate total size first
+        for file in files:
+            if not self.is_valid_file_type(file):
+                return Response({'error': f'Invalid file type: {file.name}. Only CSV, XLSX, JSON, and TSV are allowed.'}, status=400)
+
+        # Calculating dataset size
         total_size = sum(file.size for file in files)
         total_size_mb = total_size / (1024 * 1024)
 
-        # Save dataset with size immediately
         dataset = Dataset.objects.create(
             title=title,
             description=description,
@@ -207,4 +217,4 @@ class UploadDatasetView(APIView):
         dataset.files = file_paths[0]
         dataset.save()
 
-        return Response({'message': 'Dataset uploaded successfully!'}, status=201)
+        return Response({'message': 'Dataset uploaded successfully!'}, status=200)

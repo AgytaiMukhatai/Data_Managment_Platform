@@ -18,8 +18,8 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError('');  // Clear previous errors
+    setSuccess(''); // Clear previous success messages
 
     if (selectedFiles.length === 0) {
       setError('Please select at least one file.');
@@ -42,12 +42,12 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
       if (response.ok) {
         const data = await response.json();
         setSuccess('Dataset uploaded successfully!');
-        onUpload(data); // Optional callback
         setTitle('');
         setDescription('');
         setSelectedFiles([]);
-        onClose();
+        setTimeout(() => {onClose();}, 2000);
       } else {
+        // If response is not ok, get the error from the backend
         const errorData = await response.json();
         setError(errorData.error || 'Failed to upload dataset.');
       }
