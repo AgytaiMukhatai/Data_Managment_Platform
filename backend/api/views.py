@@ -182,8 +182,6 @@ class UploadDatasetView(APIView):
         return file_extension in TABULAR_FILE_EXTENSIONS
 
     def post(self, request, *args, **kwargs):
-
-        # Extract metadata from the request
         title = request.data.get('title')
         description = request.data.get('description')
         files = request.FILES.getlist('files') or []
@@ -199,21 +197,25 @@ class UploadDatasetView(APIView):
         # Calculating dataset size
         total_size = sum(file.size for file in files)
         total_size_mb = total_size / (1024 * 1024)
+        
+        file_type = ''
+        file_extension = files[0].name.split('.')[-1].lower()
+        if file_extension in TABULAR_FILE_EXTENSIONS:
+            file_type = 'Tabular'
 
         dataset = Dataset.objects.create(
             title=title,
             description=description,
             size=round(total_size_mb, 2),
+            dataset_type=file_type,
         )
 
-        # Save files
         file_paths = []
         base_path = os.path.join('datasets', dataset.title.replace(" ", "_"))
         for file in files:
             path = default_storage.save(os.path.join(base_path, file.name), file)
             file_paths.append(path)
 
-        # Store first file path (if your model supports only one file field)
         dataset.files = file_paths[0]
         dataset.save()
 
