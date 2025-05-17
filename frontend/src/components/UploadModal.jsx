@@ -13,6 +13,8 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
     if (isOpen) {
       setError('');
       setSuccess('');
+      setDescription('');
+      setTitle('');
     }
   }, [isOpen]); // This hook runs when 'isOpen' changes
 
@@ -32,12 +34,16 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
     selectedFiles.forEach((file) => {
       formData.append('files', file);
     });
+    formData.append('token', localStorage.getItem('access_token'));
 
     try {
+      const token = localStorage.getItem('access_token');
+      console.log('Access Token:', token);
       const response = await fetch('http://localhost:8000/api/upload-dataset/', {
         method: 'POST',
         body: formData,
       });
+
 
       if (response.ok) {
         const data = await response.json();

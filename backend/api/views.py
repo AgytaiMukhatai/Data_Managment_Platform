@@ -6,7 +6,11 @@ from django.shortcuts import render
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.shortcuts import render, redirect
 
 # Email sending
@@ -115,7 +119,6 @@ def login_user(request):
     email = request.data.get('email')
     password = request.data.get('password')
 
-
     try:
         user = GeneralUser.objects.get(email=email)
     except GeneralUser.DoesNotExist:
@@ -125,9 +128,11 @@ def login_user(request):
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
 
         return Response({
             'access_token': access_token,
+            'refresh_token': refresh_token,
             'message': 'Login successful'
         })
     else:
@@ -164,13 +169,11 @@ def reset_password(request, token):
     user.save()
     return Response({'message': 'Password changed'}, status=200)
 
-
 class DatasetList(APIView):
     def get(self, request):
         datasets = Dataset.objects.all()
         serializer = DatasetSerializer(datasets, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 TABULAR_FILE_EXTENSIONS = ['csv', 'xlsx', 'json', 'tsv']
 
@@ -181,7 +184,26 @@ class UploadDatasetView(APIView):
         file_extension = file.name.split('.')[-1].lower()
         return file_extension in TABULAR_FILE_EXTENSIONS
 
+    def get_user_from_token(self, request):
+        token_str = request.data.get('token')
+        if not token_str:
+            return None
+
+        try:
+            access_token = AccessToken(token_str)
+            user_id = access_token['user_id']
+            user = GeneralUser.objects.get(id=user_id)
+            return user
+        except Exception as e:
+            print("Token decode error:", e)
+            return None
+
     def post(self, request, *args, **kwargs):
+        print("🚀 UploadDatasetView.post() called")
+        user = self.get_user_from_token(request)
+        if not user:
+            return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+
         title = request.data.get('title')
         description = request.data.get('description')
         files = request.FILES.getlist('files') or []
@@ -192,22 +214,22 @@ class UploadDatasetView(APIView):
 
         for file in files:
             if not self.is_valid_file_type(file):
-                return Response({'error': f'Invalid file type: {file.name}. Only CSV, XLSX, JSON, and TSV are allowed.'}, status=400)
+                return Response(
+                    {'error': f'Invalid file type: {file.name}. Only CSV, XLSX, JSON, and TSV are allowed.'},
+                    status=400
+                )
 
-        # Calculating dataset size
         total_size = sum(file.size for file in files)
         total_size_mb = total_size / (1024 * 1024)
-        
-        file_type = ''
         file_extension = files[0].name.split('.')[-1].lower()
-        if file_extension in TABULAR_FILE_EXTENSIONS:
-            file_type = 'Tabular'
+        dataset_type = 'Tabular' if file_extension in TABULAR_FILE_EXTENSIONS else 'Unknown'
 
         dataset = Dataset.objects.create(
             title=title,
             description=description,
             size=round(total_size_mb, 2),
-            dataset_type=file_type,
+            dataset_type=dataset_type,
+            owner=user  # Assign your custom user model instance as owner
         )
 
         file_paths = []
