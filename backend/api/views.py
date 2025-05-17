@@ -175,31 +175,55 @@ class DatasetList(APIView):
         serializer = DatasetSerializer(datasets, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-TABULAR_FILE_EXTENSIONS = ['csv', 'xlsx', 'json', 'tsv']
-
 class UploadDatasetView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
+    TABULAR_FILE_EXTENSIONS = ['csv', 'xlsx', 'json', 'tsv']
+    AUDIO_FILE_EXTENSIONS = ['mp3', 'wav', 'aac', 'flac', 'ogg', 'wma', 'm4a']
+    VIDEO_FILE_EXTENSIONS = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm']
+    IMAGE_FILE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp']
+    TEXT_FILE_EXTENSIONS = ['txt', 'md', 'rtf', 'log', 'xml', 'html', 'htm']
+
+    ALL_ALLOWED_EXTENSIONS = (
+        TABULAR_FILE_EXTENSIONS +
+        AUDIO_FILE_EXTENSIONS +
+        VIDEO_FILE_EXTENSIONS +
+        IMAGE_FILE_EXTENSIONS +
+        TEXT_FILE_EXTENSIONS
+    )
+
+    def get_dataset_type(self, ext):
+        ext = ext.lower()
+        if ext in self.TABULAR_FILE_EXTENSIONS:
+            return 'Tabular'
+        elif ext in self.AUDIO_FILE_EXTENSIONS:
+            return 'Audio'
+        elif ext in self.VIDEO_FILE_EXTENSIONS:
+            return 'Video'
+        elif ext in self.IMAGE_FILE_EXTENSIONS:
+            return 'Image'
+        elif ext in self.TEXT_FILE_EXTENSIONS:
+            return 'Text'
+        else:
+            return 'Unknown'
+
     def is_valid_file_type(self, file):
         file_extension = file.name.split('.')[-1].lower()
-        return file_extension in TABULAR_FILE_EXTENSIONS
+        return file_extension in self.ALL_ALLOWED_EXTENSIONS
 
     def get_user_from_token(self, request):
         token_str = request.data.get('token')
         if not token_str:
             return None
-
         try:
             access_token = AccessToken(token_str)
             user_id = access_token['user_id']
             user = GeneralUser.objects.get(id=user_id)
             return user
-        except Exception as e:
-            print("Token decode error:", e)
+        except Exception:
             return None
 
     def post(self, request, *args, **kwargs):
-        print("🚀 UploadDatasetView.post() called")
         user = self.get_user_from_token(request)
         if not user:
             return Response({'error': 'Unauthorized or invalid token.'}, status=401)
@@ -210,35 +234,37 @@ class UploadDatasetView(APIView):
 
         if not title or not description or not files:
             return Response(
-                {'error': 'Title, description, and at least one file are required.'}, status=400)
+                {'error': 'Title, description, and at least one file are required.'},
+                status=400
+            )
 
         for file in files:
             if not self.is_valid_file_type(file):
                 return Response(
-                    {'error': f'Invalid file type: {file.name}. Only CSV, XLSX, JSON, and TSV are allowed.'},
+                    {'error': f'Invalid file type: {file.name}. Only Text, Tabular, Image, Audio abd Video files are allowed!'},
                     status=400
                 )
 
         total_size = sum(file.size for file in files)
         total_size_mb = total_size / (1024 * 1024)
-        file_extension = files[0].name.split('.')[-1].lower()
-        dataset_type = 'Tabular' if file_extension in TABULAR_FILE_EXTENSIONS else 'Unknown'
+
+        first_file_ext = files[0].name.split('.')[-1].lower()
+        dataset_type = self.get_dataset_type(first_file_ext)
+
+        folder_path = os.path.join('datasets', title.replace(" ", "_"))
+        file_count = 0
+        for file in files:
+            file_count += 1
+            default_storage.save(os.path.join(folder_path, file.name), file)
 
         dataset = Dataset.objects.create(
             title=title,
             description=description,
             size=round(total_size_mb, 2),
             dataset_type=dataset_type,
-            owner=user  # Assign your custom user model instance as owner
+            owner=user,
+            files_count=file_count,
+            files=folder_path
         )
-
-        file_paths = []
-        base_path = os.path.join('datasets', dataset.title.replace(" ", "_"))
-        for file in files:
-            path = default_storage.save(os.path.join(base_path, file.name), file)
-            file_paths.append(path)
-
-        dataset.files = file_paths[0]
-        dataset.save()
 
         return Response({'message': 'Dataset uploaded successfully!'}, status=200)

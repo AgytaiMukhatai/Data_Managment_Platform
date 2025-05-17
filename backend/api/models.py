@@ -26,6 +26,7 @@ class Dataset(models.Model):
     description = models.TextField()
     upload_date = models.DateTimeField(auto_now_add=True)
     size = models.FloatField()
+    files_count = models.IntegerField(default=0)
     dataset_type = models.CharField(max_length=50, choices=[('Text', 'Text'), ('Tabular', 'Tabular'), ('Image', 'Image'), ('Audio', 'Audio'), ('Video', 'Video')])
     views = models.IntegerField(default=0)
     likes = models.IntegerField(default=0)

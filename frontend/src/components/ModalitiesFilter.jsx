@@ -3,7 +3,6 @@ import './dashboard.css'; // Notre CSS principal
 
 export default function ModalitiesFilter({ onModalitySelect }) {
   const modalities = [
-    { label: "3D", value: "3d" },
     { label: "Image", value: "image" },
     { label: "Text", value: "text" },
     { label: "Tabular", value: "tabular" },
