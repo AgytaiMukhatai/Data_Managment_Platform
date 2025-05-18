@@ -7,7 +7,7 @@ import SizeSlider from '../components/SizeSlider';
 import DatasetList from '../components/DatasetList';
 import './datasets.css';
 
-export default function Datasets({ datasets, setDatasets, onOpenUploadModal }) {
+export default function Datasets({ datasets, onOpenUploadModal }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedModality, setSelectedModality] = useState('All');
   const [sizeRange, setSizeRange] = useState(300);
@@ -63,7 +63,7 @@ export default function Datasets({ datasets, setDatasets, onOpenUploadModal }) {
         </div>
       </div>
 
-      <DatasetList datasets={filteredDatasets} onDownload={handleDownload} />
+      <DatasetList datasets={filteredDatasets} />
     </div>
   );
 }

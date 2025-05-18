@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import './dashboard.css';
 
-export default function DatasetList({ onDownload }) {
+export default function DatasetList() {
   const { user, setUser } = useContext(UserContext);
   const [liked, setLiked] = useState(() =>
     (user.likedDatasets || []).reduce((acc, ds) => {
@@ -11,35 +11,58 @@ export default function DatasetList({ onDownload }) {
     }, {})
   );
 
-  const [datasetList, setDatasetList] = useState([]);  // Initially empty list
-
-  // Fetch datasets from the backend at regular intervals
+  const [datasetList, setDatasetList] = useState([]);
   const fetchDatasets = () => {
     fetch('http://localhost:8000/api/datasets/')
       .then((response) => response.json())
       .then((data) => {
         console.log('Fetched datasets:', data);
-        setDatasetList(data);  // Set the datasets directly from the backend
+        setDatasetList(data);
       })
       .catch((error) => {
         console.error('Error fetching datasets:', error);
       });
   };
 
-  // Poll datasets every 5 seconds
+  // Poll datasets every 3 seconds
   useEffect(() => {
-    fetchDatasets(); // Fetch datasets initially
-
-    // Set up polling to fetch datasets every 5 seconds
+    fetchDatasets();
     const interval = setInterval(() => {
       fetchDatasets();
-    }, 3000); // Poll every 5 seconds
-
-    // Cleanup interval on component unmount
+    }, 3000);
     return () => clearInterval(interval);
-  }, []); // Empty dependency array ensures this runs only on mount
+  }, []);
 
-  // Toggle like/unlike functionality for each dataset
+  const onDownload= async (dataset) => {
+    try {
+      const response = await fetch(`/datasets/download/${encodeURIComponent(dataset.title)}/`, {
+        method: 'GET',
+        headers: {
+          // Add auth headers if needed
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to download dataset');
+      }
+  
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+  
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${dataset.title}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Error downloading dataset');
+    }
+  };
+  
+
   const toggleLike = (dataset) => {
     const isLiked = liked[dataset.datasetId];
 

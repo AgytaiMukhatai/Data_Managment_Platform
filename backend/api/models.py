@@ -22,7 +22,7 @@ def dataset_upload_to(instance, filename):
 
 class Dataset(models.Model):
     owner = models.ForeignKey(GeneralUser, to_field='username', on_delete=models.CASCADE, related_name='datasets')
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, unique=True)
     description = models.TextField()
     upload_date = models.DateTimeField(auto_now_add=True)
     size = models.FloatField()

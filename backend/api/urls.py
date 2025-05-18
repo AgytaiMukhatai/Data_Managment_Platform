@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import register_general_user, login_user, verify_email, forgot_password, password_change, reset_password
-from .views import DatasetList, UploadDatasetView
+from .views import DatasetList, UploadDatasetView, DownloadDatasetView
 
 
 urlpatterns = [
@@ -12,4 +12,5 @@ urlpatterns = [
     path('reset-password/<uuid:token>/', reset_password, name='reset-password'),
     path('datasets/', DatasetList.as_view(), name='dataset-list'),
     path('upload-dataset/', UploadDatasetView.as_view(), name='upload-dataset'),
+    path('download-dataset/', DownloadDatasetView.as_view(), name='download-dataset'),
 ]

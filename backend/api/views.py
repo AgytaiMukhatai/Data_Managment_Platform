@@ -229,6 +229,8 @@ class UploadDatasetView(APIView):
             return Response({'error': 'Unauthorized or invalid token.'}, status=401)
 
         title = request.data.get('title')
+        if Dataset.objects.filter(title=title).exists():
+            return Response({'error': 'Title already exists'}, status=400)
         description = request.data.get('description')
         files = request.FILES.getlist('files') or []
 
@@ -268,3 +270,29 @@ class UploadDatasetView(APIView):
         )
 
         return Response({'message': 'Dataset uploaded successfully!'}, status=200)
+
+class DownloadDatasetView(APIView):
+    def get(self, request, title):
+        try:
+            dataset = Dataset.objects.get(title=title)
+        except Dataset.DoesNotExist:
+            return Response({'error': 'Dataset not found'}, status=404)
+
+        folder_path = dataset.files
+
+        if not os.path.exists(folder_path):
+            return Response({'error': 'Files folder not found'}, status=404)
+
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+            for root, dirs, files in os.walk(folder_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, start=folder_path)
+                    zip_file.write(file_path, arcname)
+
+        zip_buffer.seek(0)
+
+        response = HttpResponse(zip_buffer, content_type='application/zip')
+        response['Content-Disposition'] = f'attachment; filename="{dataset.title}.zip"'
+        return response

@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import './dashboard.css';
 
-export default function UploadModal({ isOpen, onClose, onUpload }) {
+export default function UploadModal({ isOpen, onClose}) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Reset the error and success messages when the modal opens
   useEffect(() => {
     if (isOpen) {
       setError('');
@@ -16,12 +15,12 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
       setDescription('');
       setTitle('');
     }
-  }, [isOpen]); // This hook runs when 'isOpen' changes
+  }, [isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');  // Clear previous errors
-    setSuccess(''); // Clear previous success messages
+    setError('');
+    setSuccess('');
 
     if (selectedFiles.length === 0) {
       setError('Please select at least one file.');
