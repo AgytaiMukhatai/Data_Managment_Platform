@@ -21,10 +21,12 @@ from django.template.loader import render_to_string
 from .models import Dataset
 from .serializers import DatasetSerializer
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.core.files.storage import default_storage
 import os
+import zipfile
+from io import BytesIO
+from django.http import HttpResponse
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync 
@@ -169,6 +171,35 @@ def reset_password(request, token):
     user.save()
     return Response({'message': 'Password changed'}, status=200)
 
+def get_user_from_token(request):
+        token_str = request.data.get('token')
+        if not token_str:
+            return None
+        try:
+            access_token = AccessToken(token_str)
+            user_id = access_token['user_id']
+            user = GeneralUser.objects.get(id=user_id)
+            return user
+        except Exception:
+            return None
+
+@api_view(['GET'])
+def user_info(request):
+    user = get_user_from_token(request)
+    if not user:
+        return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+    
+    user_data = {
+        'username': user.username,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'email': user.email,
+        'profile_image': user.profile_image
+    }
+
+    return Response(user_data, status=200)
+    
+
 class DatasetList(APIView):
     def get(self, request):
         datasets = Dataset.objects.all()
@@ -211,20 +242,8 @@ class UploadDatasetView(APIView):
         file_extension = file.name.split('.')[-1].lower()
         return file_extension in self.ALL_ALLOWED_EXTENSIONS
 
-    def get_user_from_token(self, request):
-        token_str = request.data.get('token')
-        if not token_str:
-            return None
-        try:
-            access_token = AccessToken(token_str)
-            user_id = access_token['user_id']
-            user = GeneralUser.objects.get(id=user_id)
-            return user
-        except Exception:
-            return None
-
     def post(self, request, *args, **kwargs):
-        user = self.get_user_from_token(request)
+        user = get_user_from_token(request)
         if not user:
             return Response({'error': 'Unauthorized or invalid token.'}, status=401)
 
@@ -278,7 +297,7 @@ class DownloadDatasetView(APIView):
         except Dataset.DoesNotExist:
             return Response({'error': 'Dataset not found'}, status=404)
 
-        folder_path = dataset.files
+        folder_path = dataset.files.path
 
         if not os.path.exists(folder_path):
             return Response({'error': 'Files folder not found'}, status=404)

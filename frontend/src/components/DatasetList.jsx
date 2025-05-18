@@ -35,11 +35,8 @@ export default function DatasetList() {
 
   const onDownload= async (dataset) => {
     try {
-      const response = await fetch(`/datasets/download/${encodeURIComponent(dataset.title)}/`, {
-        method: 'GET',
-        headers: {
-          // Add auth headers if needed
-        },
+      const response = await fetch(`http://localhost:8000/api/download-dataset/${encodeURIComponent(dataset.title)}/`, {
+        method: 'GET'
       });
   
       if (!response.ok) {
