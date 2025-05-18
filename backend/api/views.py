@@ -320,10 +320,45 @@ class DownloadDatasetView(APIView):
                     zip_file.write(file_path, arcname)
 
         zip_buffer.seek(0)
-
+        dataset.downloads += 1
+        dataset.save()
         response = HttpResponse(zip_buffer, content_type='application/zip')
         response['Content-Disposition'] = f'attachment; filename="{dataset.title}.zip"'
         return response
+
+@api_view(['POST'])
+def toggle_like_dataset(request, title):
+    user = get_user_from_token(request)
+    if not user:
+        return Response({'error': 'Unauthorized. Please log in to like.'}, status=401)
+
+    try:
+        dataset = Dataset.objects.get(title=title)
+    except Dataset.DoesNotExist:
+        return Response({'error': 'Dataset not found.'}, status=404)
+
+    interaction, created = LikesAndViews.objects.get_or_create(
+        username=user,
+        dataset=dataset,
+        defaults={'liked': True}
+    )
+
+    if not created:
+        # Toggle like status
+        if interaction.liked:
+            interaction.liked = False
+            dataset.likes = max(dataset.likes - 1, 0)
+        else:
+            interaction.liked = True
+            dataset.likes += 1
+        interaction.save()
+        dataset.save()
+    else:
+        # New like
+        dataset.likes += 1
+        dataset.save()
+
+    return Response(status=200)
 
 class DatasetDetailsView(APIView):
     def get(self, request, title):
@@ -331,6 +366,22 @@ class DatasetDetailsView(APIView):
             dataset = Dataset.objects.get(title=title)
         except Dataset.DoesNotExist:
             return Response({'error': 'Dataset not found'}, status=404)
+        
+        user = get_user_from_token(request)
+        
+        if user:
+            interaction, created = LikesAndViews.objects.get_or_create(
+                username=user,
+                dataset=dataset,
+                defaults={'viewed': True, 'timestamp': timezone.now()}
+            )
+            if not created:
+                interaction.viewed = True
+                interaction.timestamp = timezone.now()
+                interaction.save()
+        dataset.views += 1
+        dataset.save()
+            
         # Logic for now is not implementable
         # We need deployment in VM
         folder_path = dataset.folder_path

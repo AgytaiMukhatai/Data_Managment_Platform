@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import register_general_user, login_user, verify_email, forgot_password, password_change, reset_password, user_info
 from .views import delete_user
-from .views import DatasetList, UploadDatasetView, DownloadDatasetView
+from .views import DatasetList, UploadDatasetView, DownloadDatasetView, toggle_like_dataset
 
 
 urlpatterns = [
@@ -14,6 +14,7 @@ urlpatterns = [
     path('password-change/<uuid:token>/', password_change, name='password-change'),
     path('reset-password/<uuid:token>/', reset_password, name='reset-password'),
     path('datasets/', DatasetList.as_view(), name='dataset-list'),
+    path('like/', toggle_like_dataset, name='like'),
     path('upload-dataset/', UploadDatasetView.as_view(), name='upload-dataset'),
     path('download-dataset/<str:title>/', DownloadDatasetView.as_view(), name='download-download'),
 ]
