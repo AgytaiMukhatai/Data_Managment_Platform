@@ -30,7 +30,8 @@ class Dataset(models.Model):
     dataset_type = models.CharField(max_length=50, choices=[('Text', 'Text'), ('Tabular', 'Tabular'), ('Image', 'Image'), ('Audio', 'Audio'), ('Video', 'Video')])
     views = models.IntegerField(default=0)
     likes = models.IntegerField(default=0)
-    files = models.FileField(upload_to=dataset_upload_to)
+    downloads = models.IntegerField(default=0)
+    folder_path = models.CharField(max_length=255)
 
     def __str__(self):
         return self.title

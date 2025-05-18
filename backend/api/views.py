@@ -24,6 +24,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.core.files.storage import default_storage
 import os
+import shutil
 import zipfile
 from io import BytesIO
 from django.http import HttpResponse
@@ -199,7 +200,7 @@ def user_info(request):
 
     return Response(user_data, status=200)
 
-@api_view(['POST'])
+@api_view(['DELETE'])
 def delete_user(request):
     user = get_user_from_token(request)
     if not user:
@@ -293,7 +294,7 @@ class UploadDatasetView(APIView):
             dataset_type=dataset_type,
             owner=user,
             files_count=file_count,
-            files=folder_path
+            folder_path=folder_path
         )
 
         return Response({'message': 'Dataset uploaded successfully!'}, status=200)
@@ -305,7 +306,7 @@ class DownloadDatasetView(APIView):
         except Dataset.DoesNotExist:
             return Response({'error': 'Dataset not found'}, status=404)
 
-        folder_path = dataset.files.path
+        folder_path = dataset.folder_path
 
         if not os.path.exists(folder_path):
             return Response({'error': 'Files folder not found'}, status=404)
@@ -323,3 +324,36 @@ class DownloadDatasetView(APIView):
         response = HttpResponse(zip_buffer, content_type='application/zip')
         response['Content-Disposition'] = f'attachment; filename="{dataset.title}.zip"'
         return response
+
+class DatasetDetailsView(APIView):
+    def get(self, request, title):
+        try:
+            dataset = Dataset.objects.get(title=title)
+        except Dataset.DoesNotExist:
+            return Response({'error': 'Dataset not found'}, status=404)
+        # Logic for now is not implementable
+        # We need deployment in VM
+        folder_path = dataset.folder_path
+        return Response({'message': 'All good!'}, status=200)
+
+@api_view(['DELETE'])
+def delete_dataset(request, title):
+    user = get_user_from_token(request)
+    if not user:
+        return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+
+    try:
+        dataset = Dataset.objects.get(title=title, owner=user)
+    except Dataset.DoesNotExist:
+        return Response({'error': 'Dataset not found or you do not have permission.'}, status=404)
+
+    folder_path = dataset.folder_path
+
+    if os.path.isdir(folder_path):
+        try:
+            shutil.rmtree(folder_path)
+        except Exception as e:
+            return Response({'error': 'Failed to delete Dataset'}, status=500)
+
+    dataset.delete()
+    return Response({'message': 'Dataset and its files deleted successfully.'}, status=200)
