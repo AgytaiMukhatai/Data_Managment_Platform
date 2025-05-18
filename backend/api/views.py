@@ -198,8 +198,16 @@ def user_info(request):
     }
 
     return Response(user_data, status=200)
-    
 
+@api_view(['POST'])
+def delete_user(request):
+    user = get_user_from_token(request)
+    if not user:
+        return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+    
+    user.delete()
+    return Response({'message': 'Account deleted successfully.'}, status=200)
+    
 class DatasetList(APIView):
     def get(self, request):
         datasets = Dataset.objects.all()

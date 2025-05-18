@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import register_general_user, login_user, verify_email, forgot_password, password_change, reset_password, user_info
+from .views import delete_user
 from .views import DatasetList, UploadDatasetView, DownloadDatasetView
 
 
@@ -7,6 +8,7 @@ urlpatterns = [
     path('register/', register_general_user),
     path('login/', login_user),
     path('profile/', user_info, name='profile'),
+    path('delete-user/', delete_user, name='delete-user'),
     path('verify-email/<uuid:token>/', verify_email, name='verify-email'),
     path('forgot_password/', forgot_password, name='forgot-password'),
     path('password-change/<uuid:token>/', password_change, name='password-change'),
