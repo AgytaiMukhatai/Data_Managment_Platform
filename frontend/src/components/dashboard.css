@@ -1,35 +1,32 @@
-/* dashboard.css */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #2c3e50;
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-x: hidden;
 }
+
 .dashboard-container {
   display: flex;
   min-height: 100vh;
 }
 
-
 .main-section {
-  margin-left: 300px; /* correspond à la largeur de la sidebar */
+  margin-left: 300px;
   flex: 1;
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
 }
 
-
 .content-section {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
 }
-/* Sidebar css */
-/* Sidebar css */
+
 .sidebar {
-  position: fixed; /* fixée à gauche */
+  position: fixed;
   top: 0;
   left: 0;
   width: 300px;
@@ -41,18 +38,17 @@ body {
   padding-top: 10px;
   height: 100vh;
   box-sizing: border-box;
-  z-index: 1000; /* au-dessus du reste */
+  z-index: 1000;
 }
 
-
 .sidebar-logo {
-  margin-top: -70px; /* <-- On force encore le logo à monter */
-  margin-bottom: 20px; /* Moins d’espace après le logo */
+  margin-top: -70px;
+  margin-bottom: 20px;
 }
 
 .sidebar-logo img {
-  width: 250px; /* <-- Diminue légèrement la taille */
-  height: auto; /* Garder le ratio d'origine */
+  width: 250px;
+  height: auto;
   object-fit: contain;
 }
 
@@ -103,13 +99,13 @@ body {
 
 .profile-pic {
   width: 120px;
-  height: 120px;    /*changer la taille du Profil ici */
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ccc;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  margin-left: 120px;  /*deplcer le logo vers la droite */
-  margin-right: -100px; /*et avec l aide de ceci pour tirer la barre de recherche vers la droite*/
+  margin-left: 120px;
+  margin-right: -100px;
 }
 
 .search-form {
@@ -141,7 +137,79 @@ body {
   background-color: #27ae60;
 }
 
-/* UplaodModel  */
+.searchbar-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+}
+
+.searchbar-container {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.searchbar-input {
+  flex: 1;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px 0 0 8px;
+  outline: none;
+  margin: 0;
+}
+
+.searchbar-button {
+  background-color: #2ecc71;
+  border: 1px solid #2ecc71;
+  border-left: none;
+  padding: 12px 18px;
+  border-radius: 0 8px 8px 0;
+  font-size: 18px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  outline: none;
+}
+
+.search-results-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.results-section {
+  padding: 8px;
+}
+
+.section-title {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.result-item {
+  padding: 4px 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.result-item:hover {
+  background-color: #f1f1f1;
+}
 
 .modal-overlay {
   position: fixed;
@@ -214,7 +282,6 @@ body {
   background-color: #c0392b;
 }
 
-/* SearchBar */
 .searchbar-container {
   display: flex;
   align-items: stretch;
@@ -253,7 +320,7 @@ body {
   outline: none;
   box-sizing: border-box;
 }
-/* FilterDropdown */
+
 .filter-dropdown-container {
   margin: 20px 0;
 }
@@ -265,7 +332,7 @@ body {
   border-radius: 8px;
   background-color: #fff;
 }
-/* ModalitiesFilter */
+
 .modalities-container {
   margin: 30px 0;
   background-color: #fff;
@@ -302,7 +369,7 @@ body {
   color: white;
   border: 1px solid #2ecc71;
 }
-/* SizeSlider */
+
 .size-slider-container {
   margin: 30px 0;
   background-color: #fff;
@@ -346,7 +413,7 @@ body {
   background: #3498db;
   cursor: pointer;
 }
-/* Dataset List (card view) */
+
 .dataset-list-section {
   margin-top: 30px;
   padding: 20px;
@@ -404,6 +471,7 @@ body {
 .dataset-actions .download-btn:hover {
   background-color: #27ae60;
 }
+
 .like-btn {
   padding: 10px 16px;
   border-radius: 8px;
@@ -426,8 +494,6 @@ body {
 .like-btn.liked:hover {
   background-color: #c0392b;
 }
-
-
 
 @media (min-width: 768px) {
   .dashboard-container {

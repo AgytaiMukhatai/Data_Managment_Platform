@@ -408,3 +408,17 @@ def delete_dataset(request, title):
 
     dataset.delete()
     return Response({'message': 'Dataset and its files deleted successfully.'}, status=200)
+
+@api_view(['POST'])
+def search(request):
+    text = request.data.get('text', '').strip()
+    if not text:
+        return Response({'datasets': [], 'users': []})
+
+    datasets = Dataset.objects.filter(title__icontains=text).order_by('title')[:3]
+    users = GeneralUser.objects.filter(username__icontains=text).order_by('username')[:3]
+
+    datasets_data = [{'title': d.title} for d in datasets]
+    users_data = [{'username': u.username} for u in users]
+
+    return Response({'datasets': datasets_data, 'users': users_data})
