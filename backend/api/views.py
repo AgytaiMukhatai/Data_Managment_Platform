@@ -7,15 +7,14 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from rest_framework.permissions import AllowAny
-from rest_framework.decorators import permission_classes
-from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from django.shortcuts import render, redirect
+from pathlib import Path
 
 # Email sending
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, redirect
 
 # Dataset view
 from .models import Dataset
@@ -160,17 +159,26 @@ def password_change(request, token):
 
 @api_view(['POST'])
 def reset_password(request, token):
-    password = request.data.get('password')
-    token = request.data.get('token')
-    user = GeneralUser.objects.get(verification_token=token)
+    password = request.data.get('password', '')
+    confirm_password = request.data.get('confirm_password', '')
+
+    if not password or not confirm_password:
+        return Response({'error': 'Password and confirm password are required.'}, status=400)
+    if password != confirm_password:
+        return Response({'error': 'Passwords do not match.'}, status=400)
+
     try:
         validate_password(password)
     except ValidationError as e:
         return Response({'error': e.messages[0]}, status=400)
+    try:
+        user = GeneralUser.objects.get(verification_token=token)
+    except GeneralUser.DoesNotExist:
+        return Response({'error': 'Invalid or expired token.'}, status=404)
 
     user.password = make_password(password)
     user.save()
-    return Response({'message': 'Password changed'}, status=200)
+    return Response({'message': 'Password changed successfully.'}, status=200)
 
 def get_user_from_token(request):
         token_str = request.data.get('token')
@@ -200,14 +208,112 @@ def user_info(request):
 
     return Response(user_data, status=200)
 
+@api_view(['POST'])
+def update_password(request):
+    user = get_user_from_token(request)
+    if not user:
+        return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+
+    new_password = request.data.get('new_password', '')
+    confirm_password = request.data.get('confirm_password', '')
+
+    if not new_password or not confirm_password:
+        return Response({'error': 'New password and confirmation are required.'}, status=400)
+
+    if new_password != confirm_password:
+        return Response({'error': 'New password and confirmation do not match.'}, status=400)
+
+    try:
+        validate_password(new_password)
+    except ValidationError as e:
+        return Response({'error': e.messages[0]}, status=400)
+
+    user.password = make_password(new_password)
+    user.save()
+
+    return Response({'message': 'Password updated successfully.'}, status=200)
+
+@api_view(['POST'])
+def upload_profile_image(request):
+    user = get_user_from_token(request)
+    if not user:
+        return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+
+    image_file = request.FILES.get('profile_image')
+    if not image_file:
+        return Response({'error': 'No image file provided.'}, status=400)
+
+    folder_path = 'profile_images'
+    os.makedirs(folder_path, exist_ok=True)
+    ext = image_file.name.split('.')[-1]
+    filename = f"{user.username}.{ext}"
+    file_path = os.path.join(folder_path, filename)
+
+    try:
+        if default_storage.exists(file_path):
+            default_storage.delete(file_path)
+        default_storage.save(file_path, ContentFile(image_file.read()))
+    except Exception as e:
+        return Response({'error': 'Failed to save image file.'}, status=500)
+
+    user.profile_image = file_path
+    user.save()
+
+    return Response({'message': 'Profile image uploaded successfully.', 'profile_image': user.profile_image})
+
+@api_view(['PATCH'])
+def update_user(request):
+    user = get_user_from_token(request)
+    if not user:
+        return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+
+    data = request.data
+    new_username = data.get('username', '').strip()
+    new_first_name = data.get('first_name', '').strip()
+    new_last_name = data.get('last_name', '').strip()
+
+    if new_username != user.username:
+        if GeneralUser.objects.filter(username=new_username).exists():
+            return Response({'error': 'Username already exists.'}, status=400)
+
+        profile_dir = Path('profile_images')
+        old_files = list(profile_dir.glob(f"{user.username}.*"))
+        for old_file in old_files:
+            new_file = profile_dir / f"{new_username}{old_file.suffix}"
+            try:
+                old_file.rename(new_file)
+            except Exception as e:
+                return Response({'error': f'Failed to rename profile image: {str(e)}'}, status=500)
+
+        user.username = new_username
+
+    user.first_name = new_first_name
+    user.last_name = new_last_name
+
+    user.save()
+
+    return Response({'message': 'User updated successfully.'}, status=200)
+
+
 @api_view(['DELETE'])
 def delete_user(request):
     user = get_user_from_token(request)
     if not user:
         return Response({'error': 'Unauthorized or invalid token.'}, status=401)
-    
+
+    profile_dir = Path('profile_images')
+    profile_images = list(profile_dir.glob(f"{user.username}.*"))
+    for img_file in profile_images:
+        if img_file.exists() and img_file.is_file():
+            try:
+                img_file.unlink()
+            except Exception as e:
+                return Response({'error': f'Failed to delete profile image: {str(e)}'}, status=500)
+
     user.delete()
+
     return Response({'message': 'Account deleted successfully.'}, status=200)
+
     
 class DatasetList(APIView):
     def get(self, request):
@@ -344,7 +450,7 @@ def toggle_like_dataset(request, title):
     )
 
     if not created:
-        # Toggle like status
+        # Toggle like
         if interaction.liked:
             interaction.liked = False
             dataset.likes = max(dataset.likes - 1, 0)
