@@ -178,7 +178,7 @@ def reset_password(request, token):
 
     user.password = make_password(password)
     user.save()
-    return Response({'message': 'Password changed successfully.'}, status=200)
+    return Response({'message': 'Password changed'}, status=201)
 
 def get_user_from_token(request):
         token_str = request.data.get('token')
@@ -319,7 +319,7 @@ class DatasetList(APIView):
     def get(self, request):
         datasets = Dataset.objects.all()
         serializer = DatasetSerializer(datasets, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=200)
 
 class UploadDatasetView(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -492,6 +492,123 @@ class DatasetDetailsView(APIView):
         # We need deployment in VM
         folder_path = dataset.folder_path
         return Response({'message': 'All good!'}, status=200)
+
+@api_view(['PATCH'])
+def update_dataset(request, title):
+    user = get_user_from_token(request)
+    if not user:
+        return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+
+    try:
+        dataset = Dataset.objects.get(title=title, owner=user)
+    except Dataset.DoesNotExist:
+        return Response({'error': 'Dataset not found or you do not have permission.'}, status=404)
+
+    new_title = request.data.get('title', dataset.title).strip()
+    new_description = request.data.get('description', dataset.description).strip()
+
+    if new_title != dataset.title:
+        if Dataset.objects.filter(title=new_title).exists():
+            return Response({'error': 'Title already exists.'}, status=400)
+
+        old_folder = dataset.folder_path
+        new_folder = os.path.join(os.path.dirname(old_folder), new_title.replace(" ", "_"))
+
+        try:
+            if os.path.exists(old_folder):
+                os.rename(old_folder, new_folder)
+        except Exception as e:
+            return Response({'error': f'Failed to rename folder: {str(e)}'}, status=500)
+
+        dataset.title = new_title
+        dataset.folder_path = new_folder
+
+    dataset.description = new_description
+    dataset.save()
+
+    return Response({'message': 'Dataset updated successfully.'}, status=200)
+
+class AddFilesToDatasetView(UploadDatasetView):
+
+    def post(self, request, title):
+        user = get_user_from_token(request)
+        if not user:
+            return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+
+        try:
+            dataset = Dataset.objects.get(title=title, owner=user)
+        except Dataset.DoesNotExist:
+            return Response({'error': 'Dataset not found or you do not have permission.'}, status=404)
+
+        files = request.FILES.getlist('files') or []
+        if not files:
+            return Response({'error': 'No files provided.'}, status=400)
+
+        folder_path = dataset.folder_path
+        total_size = 0
+        new_files_count = 0
+
+        for file in files:
+            if not self.is_valid_file_type(file):
+                return Response({'error': f'Invalid file type: {file.name}.'}, status=400)
+
+            ext = file.name.split('.')[-1].lower()
+            file_type = self.get_dataset_type(ext)
+            if file_type != dataset.dataset_type:
+                return Response({'error': f'File "{file.name}" type does not match dataset type ({dataset.dataset_type}).'}, status=400)
+
+            save_path = os.path.join(folder_path, file.name)
+            if default_storage.exists(save_path):
+                return Response({'error': f'File already exists: {file.name}'}, status=400)
+
+            default_storage.save(save_path, file)
+            total_size += file.size
+            new_files_count += 1
+
+        dataset.size += total_new_size / (1024 * 1024)
+        dataset.files_count += new_files_count
+        dataset.save()
+
+        return Response({'message': f'{new_files_count} files added successfully.'}, status=200)
+
+@api_view(['POST'])
+def delete_files(request, title):
+    user = get_user_from_token(request)
+    if not user:
+        return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+
+    try:
+        dataset = Dataset.objects.get(title=title, owner=user)
+    except Dataset.DoesNotExist:
+        return Response({'error': 'Dataset not found or you do not have permission.'}, status=404)
+
+    files_to_delete = request.data.get('files', [])
+    if not files_to_delete or not isinstance(files_to_delete, list):
+        return Response({'error': 'Provide a list of files to delete.'}, status=400)
+
+    folder_path = dataset.folder_path
+
+    total_deleted_size = 0
+    deleted_files_count = 0
+
+    for filename in files_to_delete:
+        file_path = os.path.join(folder_path, filename)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            try:
+                file_size = os.path.getsize(file_path)
+                os.remove(file_path)
+                total_deleted_size += file_size
+                deleted_files_count += 1
+            except Exception as e:
+                return Response({'error': f'Failed to delete file {filename}: {str(e)}'}, status=500)
+        else:
+            return Response({'error': f'File not found: {filename}'}, status=404)
+
+    dataset.size -= total_deleted_size / (1024 * 1024)
+    dataset.files_count = max(dataset.files_count - deleted_files_count, 0)
+    dataset.save()
+
+    return Response({'message': f'{deleted_files_count} files deleted successfully.'}, status=200)
 
 @api_view(['DELETE'])
 def delete_dataset(request, title):

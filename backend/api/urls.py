@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import register_general_user, login_user, verify_email, forgot_password, password_change, reset_password, user_info
-from .views import delete_user, delete_dataset, update_user, upload_profile_image, update_password
-from .views import DatasetList, UploadDatasetView, DownloadDatasetView, toggle_like_dataset, search
+from .views import delete_user, delete_dataset, update_user, upload_profile_image, update_password, update_dataset, delete_files
+from .views import DatasetList, UploadDatasetView, DownloadDatasetView, AddFilesToDatasetView, toggle_like_dataset, search
 
 
 urlpatterns = [
@@ -21,5 +21,8 @@ urlpatterns = [
     path('search/', search, name='search'),
     path('upload-dataset/', UploadDatasetView.as_view(), name='upload-dataset'),
     path('download-dataset/<str:title>/', DownloadDatasetView.as_view(), name='download-download'),
+    path('add-files-dataset/<str:title>/', AddFilesToDatasetView.as_view(), name='add-files-dataset'),
+    path('delete-files-dataset/', delete_files, name='delete-files-dataset'),
+    path('update-dataset/', update_dataset, name='update-dataset'),
     path('delete-dataset/', delete_dataset, name='delete-dataset'),
 ]

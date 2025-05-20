@@ -21,7 +21,7 @@ def dataset_upload_to(instance, filename):
     return os.path.join('datasets', folder_name, filename)
 
 class Dataset(models.Model):
-    owner = models.ForeignKey(GeneralUser, to_field='username', on_delete=models.CASCADE, related_name='datasets')
+    owner = models.ForeignKey(GeneralUser, on_delete=models.CASCADE, related_name='datasets')
     title = models.CharField(max_length=255, unique=True)
     description = models.TextField()
     upload_date = models.DateTimeField(auto_now_add=True)
@@ -36,9 +36,9 @@ class Dataset(models.Model):
     def __str__(self):
         return self.title
 
-class LikesAndViews(models.Model):
-    user = models.ForeignKey('GeneralUser', on_delete=models.CASCADE, related_name='interactions')
-    dataset = models.ForeignKey('Dataset', on_delete=models.CASCADE, related_name='interactions')
+class LikesAndViewsDataset(models.Model):
+    user = models.ForeignKey('GeneralUser', on_delete=models.CASCADE, related_name='dataItr')
+    dataset = models.ForeignKey('Dataset', on_delete=models.CASCADE, related_name='dataItr')
     liked = models.BooleanField(default=False)
     viewed = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now=True)
@@ -48,3 +48,31 @@ class LikesAndViews(models.Model):
 
     def __str__(self):
         return f"{self.user.username} -> {self.dataset.title}"
+
+class MLModel(models.Model):
+    owner = models.ForeignKey(GeneralUser, on_delete=models.CASCADE, related_name='models')
+    title = models.CharField(max_length=255, unique=True)
+    description = models.TextField()
+    upload_date = models.DateTimeField(auto_now_add=True)
+    size = models.FloatField()
+    model_type = models.CharField(max_length=50)
+    views = models.IntegerField(default=0)
+    likes = models.IntegerField(default=0)
+    downloads = models.IntegerField(default=0)
+    folder_path = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.title
+
+class LikesAndViewsModel(models.Model):
+    user = models.ForeignKey('GeneralUser', on_delete=models.CASCADE, related_name='modelItr')
+    model = models.ForeignKey('MLModel', on_delete=models.CASCADE, related_name='modelItr')
+    liked = models.BooleanField(default=False)
+    viewed = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'model')
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.model.title}"
