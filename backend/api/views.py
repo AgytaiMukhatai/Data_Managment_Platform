@@ -314,10 +314,73 @@ def delete_user(request):
 
     return Response({'message': 'Account deleted successfully.'}, status=200)
 
+@api_view(['GET'])
+def dist_user_data(request):
+    username = request.data.get('username')
+    try:
+        user = GeneralUser.objects.get(username=username)
+    except GeneralUser.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
+
+    user_data = {
+        'username': user.username,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'profile_image': user.profile_image
+    }
+
+    return Response(user_data, status=200)
+
     
 class DatasetList(APIView):
     def get(self, request):
         datasets = Dataset.objects.all()
+        serializer = DatasetSerializer(datasets, many=True)
+        return Response(serializer.data, status=200)
+
+class ProfileDatasetList(APIView):
+    def get(self, request):
+        user = get_user_from_token(request)
+        if not user:
+            return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+
+        datasets = Dataset.objects.filter(owner=user)
+        serializer = DatasetSerializer(datasets, many=True)
+        return Response(serializer.data, status=200)
+
+class DistUserDatasetList(APIView):
+    def get(self, request):
+        username = request.data.get('username')
+        try:
+            user = GeneralUser.objects.get(username=username)
+        except GeneralUser.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+
+        datasets = Dataset.objects.filter(owner=user)
+        serializer = DatasetSerializer(datasets, many=True)
+        return Response(serializer.data, status=200)
+
+class LikedDataset(APIView):
+    def get(self, request):
+        user = get_user_from_token(request)
+        if not user:
+            return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+
+        liked_datasets = LikesAndViewsDataset.objects.filter(user=user, liked=True)
+        dataset_ids = [item.dataset.id for item in liked_datasets]
+        datasets = Dataset.objects.filter(id__in=dataset_ids)
+        serializer = DatasetSerializer(datasets, many=True)
+        return Response(serializer.data, status=200)
+
+class RecentlyViewedDataset(APIView):
+    def get(self, request):
+        user = get_user_from_token(request)
+        if not user:
+            return Response({'error': 'Unauthorized or invalid token.'}, status=401)
+
+        viewed_datasets = LikesAndViewsDataset.objects.filter(user=user, viewed=True).order_by('-timestamp')
+        dataset_ids = [item.dataset.id for item in viewed_datasets]
+        datasets = Dataset.objects.filter(id__in=dataset_ids)
         serializer = DatasetSerializer(datasets, many=True)
         return Response(serializer.data, status=200)
 

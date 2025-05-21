@@ -1,8 +1,5 @@
 from django.urls import path
-from .views import register_general_user, login_user, verify_email, forgot_password, password_change, reset_password, user_info
-from .views import delete_user, delete_dataset, update_user, upload_profile_image, update_password, update_dataset, delete_files
-from .views import DatasetList, UploadDatasetView, DownloadDatasetView, AddFilesToDatasetView, toggle_like_dataset, search
-
+from .views import *
 
 urlpatterns = [
     path('register/', register_general_user),
@@ -16,7 +13,12 @@ urlpatterns = [
     path('forgot_password/', forgot_password, name='forgot-password'),
     path('password-change/<uuid:token>/', password_change, name='password-change'),
     path('reset-password/<uuid:token>/', reset_password, name='reset-password'),
-    path('datasets/', DatasetList.as_view(), name='dataset-list'),
+    path('datasets/', DatasetList.as_view(), name='datasets'),
+    path('profile-datasets/', ProfileDatasetList.as_view(), name='profile-datasets'),
+    path('liked-datasets/', LikedDataset.as_view(), name='profile-datasets'),
+    path('recently-viewed-datasets/', RecentlyViewedDataset.as_view(), name='recently-viewed-datasets'),
+    path('dist-user-page/', dist_user_data, name='dist-user-page'),
+    path('dist-user-datasets/', DistUserDatasetList.as_view(), name='dist-user-datasets'),
     path('like/', toggle_like_dataset, name='like'),
     path('search/', search, name='search'),
     path('upload-dataset/', UploadDatasetView.as_view(), name='upload-dataset'),
