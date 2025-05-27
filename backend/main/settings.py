@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'api',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -162,3 +164,13 @@ EMAIL_HOST_PASSWORD = 'qpvs brer ivpf viad'
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = ['authorization', 'content-type']
+
+import sys
+
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:'
+        }
+    }
