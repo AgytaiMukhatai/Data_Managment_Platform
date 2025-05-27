@@ -1,26 +1,27 @@
-import { useState, useEffect } from 'react';
-import './dashboard.css';
+ import { useState, useEffect } from 'react';
+import './UploadModal.css';
+import { FaUpload } from 'react-icons/fa';
 
-export default function UploadModal({ isOpen, onClose}) {
+
+export default function UploadModal({ isOpen, onClose, onUpload }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Reset the error and success messages when the modal opens
   useEffect(() => {
     if (isOpen) {
       setError('');
       setSuccess('');
-      setDescription('');
-      setTitle('');
     }
-  }, [isOpen]);
+  }, [isOpen]); // This hook runs when 'isOpen' changes
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError('');  // Clear previous errors
+    setSuccess(''); // Clear previous success messages
 
     if (selectedFiles.length === 0) {
       setError('Please select at least one file.');
@@ -33,16 +34,12 @@ export default function UploadModal({ isOpen, onClose}) {
     selectedFiles.forEach((file) => {
       formData.append('files', file);
     });
-    formData.append('token', localStorage.getItem('access_token'));
 
     try {
-      const token = localStorage.getItem('access_token');
-      console.log('Access Token:', token);
       const response = await fetch('http://localhost:8000/api/upload-dataset/', {
         method: 'POST',
         body: formData,
       });
-
 
       if (response.ok) {
         const data = await response.json();
@@ -96,6 +93,7 @@ export default function UploadModal({ isOpen, onClose}) {
               Cancel
             </button>
             <button type="submit" className="upload-btn">
+              <FaUpload style={{ marginRight: '8px' }} />
               Upload
             </button>
           </div>

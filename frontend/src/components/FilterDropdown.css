@@ -1,0 +1,13 @@
+/* FilterDrop.css */
+
+.filter-dropdown-container {
+  margin: 20px 0;
+}
+
+.filter-dropdown-select {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+}

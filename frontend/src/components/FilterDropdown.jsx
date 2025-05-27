@@ -1,6 +1,7 @@
 // src/components/FilterDropdown.jsx
 import { useState } from 'react';
-import './dashboard.css'; // Toujours notre fichier global
+import './FilterDropdown.css';
+
 
 export default function FilterDropdown({ onFilterChange }) {
   const [selectedFilter, setSelectedFilter] = useState('');

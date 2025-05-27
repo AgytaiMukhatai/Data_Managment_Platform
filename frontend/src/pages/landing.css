@@ -1,0 +1,129 @@
+.landing-page {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #eaf4fb;
+  color: #333;
+  text-align: center;
+  animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.header {
+  padding: 30px 20px;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 300px;
+  margin-bottom: 20px;
+}
+
+.logo img {
+  width: 200px;
+  height: 50px;
+  margin-top:150px;
+  margin-bottom: 10px;
+}
+
+.logo h1 {
+  margin: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 26px;
+  color: #2c3e50;
+}
+
+.intro-text {
+  font-size: 18px;
+  margin: 15px 0 30px;
+  color: #4b4b4b;
+}
+
+.btn {
+  background-color: #2E3A59;
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.btn:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+  background-color: #2E3A59;
+}
+
+.features {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 80px 0;
+  gap: 30px;
+}
+
+.feature {
+  width: 150px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.feature img {
+  width: 80px;
+  margin-bottom: 10px;
+}
+
+.feature:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature p {
+  font-weight: bold;
+  color: #197de1;
+}
+
+.footer {
+  background-color: #f0f0f0;
+  padding: 20px 10px;
+  font-size: 14px;
+  color: #777;
+  border-top: 1px solid #ddd;
+}
+
+.footer .socials {
+  margin-top: 10px;
+}
+
+.footer .socials a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 10px;
+  text-decoration: none;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.footer .socials a img {
+  width: 30px;
+  height: 25px;
+}
+
+.footer .socials a:hover {
+  text-decoration: underline;
+}

@@ -1,9 +1,9 @@
 // src/pages/Profile.jsx
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Sidebar from '../components/Sidebar'
 import './profile.css'
 import defaultAvatar from '/Images/user (1).png'
+
 
 export default function Profile() {
 	const navigate = useNavigate()
@@ -58,16 +58,9 @@ export default function Profile() {
 
 	return (
 		<div className='page-container'>
-			<Sidebar activePage='profile' />
-
 			<div className='profile-page'>
 				<section className='detail-section'>
 					<div className='container'>
-						<div className='back-button-container'>
-							<button className='back-button' onClick={() => navigate(-1)}>
-								&larr; Back
-							</button>
-						</div>
 						<h1 className='title'>User Profile</h1>
 						<p className='description'>
 							Manage your personal information and datasets
@@ -183,6 +176,18 @@ export default function Profile() {
 						</div>
 					</div>
 				</section>
+					<section className="logout-section">
+							<button
+								className="logout-button"
+								onClick={() => {
+								localStorage.clear(); // Supprime les tokens s'il y en a
+								window.location.href = '/login'; // Redirige vers la page de login
+								}}
+								>
+								Logout
+							</button>
+					</section>
+
 			</div>
 		</div>
 	)

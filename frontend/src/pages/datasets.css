@@ -1,19 +1,52 @@
-/* datasets.css */
 .datasets-page {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* gerer la taille en largeur de la page  datasets */
+  max-width: 1500px;
+  margin: 0 auto;
   padding: 30px;
 }
 
-.datasets-header {
+/* Top section layout (Modalities + Size + Upload + Filter) */
+.datasets-top-section {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
+  gap: 5px;
   flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  height: auto;
 }
 
+/* Left section = Modalities (65%) */
+.left-section {
+  flex: 0 0 65%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap:40px;
+}
+
+/* Right section = Size slider + buttons (35%) */
+.right-section {
+  flex: 0 0 25%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+/* Upload + Filter row in right section */
+.upload-filter-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 100px;
+  margin-top: auto;
+}
+
+/* Upload button style */
 .upload-btn {
-  background-color: #3498db; /* Bleu */
+  background-color: #2E3A59;
   color: white;
   padding: 10px 20px;
   border-radius: 10px;
@@ -21,39 +54,23 @@
   border: none;
   cursor: pointer;
   transition: background-color 0.3s;
+  width: 180px;
 }
 
 .upload-btn:hover {
-  background-color: #2980b9;
+  background-color: #145eaa;
 }
 
-/* Nouveau : Ligne contenant ModalitiesFilter + SizeSlider */
-.filter-row {
-  display: flex;
-  gap: 5%;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
-}
-
-.modalities-column {
-  flex: 0 0 65%;
-}
-
-.size-column {
-  flex: 0 0 30%;
-}
-
-/* Conserver les styles existants des composants imbriqués */
-.modalities-container,
-.size-slider-container {
-  background-color: #fff;
+/* Modalities box */
+.modalities-container {
+  background-color: #ffffff;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  height: 100%;
 }
 
-.modalities-container h3,
-.size-slider-container label {
+.modalities-container h3 {
   margin-bottom: 15px;
   color: #2c3e50;
 }
@@ -72,36 +89,5 @@
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s;
-}
-
-.modality-button:hover {
-  background-color: #2ecc71;
-  color: white;
-  border: 1px solid #2ecc71;
-}
-
-.size-slider-container input[type="range"] {
-  width: 100%;
-  height: 8px;
-  background: #2ecc71;
-  border-radius: 5px;
-  outline: none;
-  transition: background 0.3s;
-}
-
-.size-slider-container input[type="range"]::-webkit-slider-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #3498db;
-  cursor: pointer;
-}
-
-.size-slider-container input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #3498db;
-  cursor: pointer;
+  transition: all
 }

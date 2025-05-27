@@ -1,114 +1,161 @@
-import { useState, useEffect, useContext } from 'react';
-import { UserContext } from '../contexts/UserContext';
-import './dashboard.css';
+// src/components/DatasetList.jsx
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { FaImage, FaAlignLeft, FaVolumeUp, FaPlayCircle, FaTable, FaHeart, FaDownload, FaEye }
+from "react-icons/fa";
+import "./DatasetList.css";
+// 🔒 API setup (commenté pour design statique)
+// const [datasetList, setDatasetList] = useState([]);
+// const fetchDatasets = () => {
+//   fetch('http://localhost:8000/api/datasets/')
+//     .then((response) => response.json())
+//     .then((data) => setDatasetList(data))
+//     .catch((error) => console.error('Error fetching datasets:', error));
+// };
+
+// useEffect(() => {
+//   fetchDatasets();
+//   const interval = setInterval(() => fetchDatasets(), 3000);
+//   return () => clearInterval(interval);
+// }, []);
 
 export default function DatasetList() {
-  const { user, setUser } = useContext(UserContext);
-  const [liked, setLiked] = useState(() =>
-    (user.likedDatasets || []).reduce((acc, ds) => {
-      acc[ds.datasetId] = true;
-      return acc;
-    }, {})
-  );
-
-  const [datasetList, setDatasetList] = useState([]);
-  const fetchDatasets = () => {
-    fetch('http://localhost:8000/api/datasets/')
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Fetched datasets:', data);
-        setDatasetList(data);
-      })
-      .catch((error) => {
-        console.error('Error fetching datasets:', error);
-      });
-  };
-
-  // Poll datasets every 3 seconds
-  useEffect(() => {
-    fetchDatasets();
-    const interval = setInterval(() => {
-      fetchDatasets();
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const onDownload= async (dataset) => {
-    try {
-      const response = await fetch(`http://localhost:8000/api/download-dataset/${encodeURIComponent(dataset.title)}/`, {
-        method: 'GET'
-      });
+  // const navigate = useNavigate();
+  const [liked, setLiked] = useState({});
   
-      if (!response.ok) {
-        throw new Error('Failed to download dataset');
+  const staticDatasets = [
+    {
+      datasetId: '1',
+      title: 'Customer Reviews',
+      type: 'text',
+      uploadedBy: 'UserX',
+      uploadDate: '2024-12-17',
+      size: '328 MB',
+      likes: 35,
+      downloads: 122,
+      views: 300, 
+      description: 'Lorem ipsum dolor sit amet...',
+      tags: ['#Tag', '#Another Tag'],
+      metadata: {
+        numberOfFiles: 123,
+        formats: ['txt', 'doc']
       }
-  
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-  
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${dataset.title}.zip`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Download error:', error);
-      alert('Error downloading dataset');
+    },
+    {
+      datasetId: '2',
+      title: 'Product Images Set',
+      type: 'image',
+      uploadedBy: 'UserY',
+      uploadDate: '2024-12-17',
+      size: '342 MB',
+      likes: 45,
+      downloads: 321,
+      views: 130, 
+      description: 'This is an image dataset...',
+      tags: ['#Image', '#Photos'],
+      metadata: {
+        numberOfFiles: 230,
+        formats: ['jpeg', 'png']
+      }
+    },
+    {
+      datasetId: '3',
+      title: 'Podcast Episode Audio',
+      type: 'audio',
+      uploadedBy: 'UserA',
+      uploadDate: '2025-06-17',
+      size: '389 MB',
+      likes: 93,
+      downloads: 62,
+      views: 49, 
+      description: 'Podcast and audio clips.',
+      tags: ['#Podcast', '#Talk'],
+      metadata: {
+        numberOfFiles: 230,
+        formats: ['mp3', 'wav']
+      }
+    },
+    {
+      datasetId: '4',
+      title: 'Survey Results',
+      type: 'tabular',
+      uploadedBy: 'UserB',
+      uploadDate: '2023-11-01',
+      size: '124 MB',
+      likes: 87,
+      downloads: 400,
+      views: 80, 
+      description: 'Survey data with charts.',
+      tags: ['#Survey', '#CSV'],
+      metadata: {
+        numberOfFiles: 2,
+        formats: ['csv']
+      }
     }
-  };
-  
+  ];
 
-  const toggleLike = (dataset) => {
-    const isLiked = liked[dataset.datasetId];
-
+  const toggleLike = (datasetId) => {
     setLiked((prev) => ({
       ...prev,
-      [dataset.datasetId]: !isLiked,
+      [datasetId]: !prev[datasetId],
     }));
+  };
 
-    const updatedLikes = isLiked
-      ? user.likedDatasets.filter((ds) => ds.datasetId !== dataset.datasetId)
-      : [...(user.likedDatasets || []), dataset];
-
-    setUser({ ...user, likedDatasets: updatedLikes });
+  const getIcon = (type) => {
+    switch (type) {
+      case "text":
+        return <FaAlignLeft />;
+      case "image":
+        return <FaImage />;
+      case "audio":
+        return <FaVolumeUp />;
+      case "video":
+        return <FaPlayCircle />;
+      case "tabular":
+        return <FaTable />;
+      default:
+        return null;
+    }
   };
 
   return (
     <section className="dataset-list-section">
       <h2>Datasets</h2>
       <div className="dataset-list">
-        {datasetList.length === 0 ? (
-          <p>No datasets uploaded yet.</p>
-        ) : (
-          datasetList.map((dataset) => (
-            <div key={dataset.datasetId} className="dataset-card">
-              <div className="dataset-info">
-                <h3>{dataset.title}</h3>
-                <p>{dataset.description}</p>
-                <div className="dataset-meta">
-                  <span><strong>Type:</strong> {dataset.dataset_type}</span>
-                  <span><strong>Size:</strong> {dataset.size} MB</span>
-                  <span><strong>Uploaded:</strong> {new Date(dataset.upload_date).toLocaleDateString()}</span>
-                  <span><strong>Views:</strong> {dataset.views}</span>
-                  <span><strong>Likes:</strong> {dataset.likes}</span>
-                </div>
+        {staticDatasets.map((ds) => (
+          <Link
+            to={"/detailpages/" + ds.datasetId}
+            key={ds.datasetId}
+            className="dataset-card"
+            style={{ cursor: "pointer", textDecoration: "none" }}
+          >
+            <div className="dataset-row">
+              <div className="dataset-title-icon">
+                {getIcon(ds.type)}
+                <h3 className="dataset-title">{ds.title}</h3>
               </div>
-              <div className="dataset-actions">
-                <button onClick={() => onDownload(dataset)} className="download-btn">
-                  Download
-                </button>
-                <button
-                  className={`like-btn ${liked[dataset.datasetId] ? 'liked' : ''}`}
-                  onClick={() => toggleLike(dataset)}
+              <div className="dataset-meta">
+                <span>{ds.size}</span>
+                <span>
+                  Uploaded {new Date(ds.uploadDate).toLocaleDateString()}
+                </span>
+                <span
+                  className="icon-meta"
+                  onClick={() => toggleLike(ds.datasetId)}
                 >
-                  {liked[dataset.datasetId] ? '♥ Liked' : '♡ Like'}
-                </button>
+                  <FaHeart className={liked[ds.datasetId] ? "liked" : ""} />{" "}
+                  {ds.likes + (liked[ds.datasetId] ? 1 : 0)}
+                </span>
+                <span className="icon-meta">
+                  <FaDownload /> {ds.downloads}
+                </span>
+                <span className="icon-meta">
+                  <FaEye /> {ds.views}
+                </span>
               </div>
             </div>
-          ))
-        )}
+          </Link>
+        ))}
       </div>
     </section>
   );

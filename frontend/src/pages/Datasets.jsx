@@ -1,10 +1,10 @@
 // src/pages/Datasets.jsx
 import { useState } from 'react';
-import SearchBar from '../components/SearchBar';
 import FilterDropdown from '../components/FilterDropdown';
 import ModalitiesFilter from '../components/ModalitiesFilter';
 import SizeSlider from '../components/SizeSlider';
 import DatasetList from '../components/DatasetList';
+import { FaUpload } from 'react-icons/fa';
 import './datasets.css';
 
 export default function Datasets({ datasets, onOpenUploadModal }) {
@@ -12,27 +12,12 @@ export default function Datasets({ datasets, onOpenUploadModal }) {
   const [selectedModality, setSelectedModality] = useState('All');
   const [sizeRange, setSizeRange] = useState(300);
 
-  const handleSearch = (query) => {
-    setSearchQuery(query.toLowerCase());
-  };
-
   const handleFilter = (modality) => {
     setSelectedModality(modality);
   };
 
   const handleSizeChange = (value) => {
     setSizeRange(value);
-  };
-
-  const handleDownload = (dataset) => {
-    const url = URL.createObjectURL(dataset.file);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = dataset.title;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
   const filteredDatasets = datasets.filter(dataset => {
@@ -46,20 +31,19 @@ export default function Datasets({ datasets, onOpenUploadModal }) {
 
   return (
     <div className="datasets-page">
-      <div className="datasets-header">
-        <SearchBar
-          onSearch={handleSearch}
-          onOpenUploadModal={onOpenUploadModal}
-        />
-        <FilterDropdown onFilter={handleFilter} />
-      </div>
-
-      <div className="filter-row">
-        <div className="modalities-column">
+      <div className="datasets-top-section">
+        <div className="left-section">
           <ModalitiesFilter onModalitySelect={handleFilter} />
         </div>
-        <div className="size-column">
+        <div className="right-section">
           <SizeSlider onChange={handleSizeChange} value={sizeRange} />
+          <div className="upload-filter-row">
+            <button className="upload-btn" onClick={onOpenUploadModal}>
+              <FaUpload style={{ marginRight: '8px' }} />
+              Upload
+            </button>
+            <FilterDropdown onFilterChange={handleFilter} />
+          </div>
         </div>
       </div>
 

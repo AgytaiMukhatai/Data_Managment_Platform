@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaSearch, FaUpload } from 'react-icons/fa';
-import './dashboard.css';
+import { FaSearch } from 'react-icons/fa';
+import './Searchbar.css';
 
-export default function SearchBar({ onSearch, onOpenUploadModal }) {
+export default function SearchBar({ onSearch }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState({ datasets: [], users: [] });
   const [showDropdown, setShowDropdown] = useState(false);
@@ -71,25 +71,17 @@ export default function SearchBar({ onSearch, onOpenUploadModal }) {
       >
         <input
           type="text"
-          placeholder="Search datasets or users..."
+          placeholder="Search..."
           value={query}
           onChange={handleInputChange}
           className="searchbar-input"
-          onFocus={() => { if (results.datasets.length || results.users.length) setShowDropdown(true); }}
+          onFocus={() => {
+            if (results.datasets.length || results.users.length)
+              setShowDropdown(true);
+          }}
         />
-
         <button type="submit" className="searchbar-button">
           <FaSearch />
-        </button>
-
-        <button
-          type="button"
-          className="upload-btn"
-          style={{ marginLeft: '10px' }}
-          onClick={onOpenUploadModal}
-        >
-          <FaUpload style={{ marginRight: '6px' }} />
-          Upload
         </button>
       </form>
 
@@ -98,18 +90,17 @@ export default function SearchBar({ onSearch, onOpenUploadModal }) {
           {results.datasets.length > 0 && (
             <div className="results-section">
               <div className="section-title">Datasets</div>
-              {results.datasets.map(dataset => (
+              {results.datasets.map((dataset) => (
                 <div key={dataset.id} className="result-item">
                   {dataset.title}
                 </div>
               ))}
             </div>
           )}
-
           {results.users.length > 0 && (
             <div className="results-section">
               <div className="section-title">Users</div>
-              {results.users.map(user => (
+              {results.users.map((user) => (
                 <div key={user.username} className="result-item">
                   {user.username}
                 </div>

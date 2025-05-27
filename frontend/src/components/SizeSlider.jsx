@@ -1,6 +1,6 @@
 // src/components/SizeSlider.jsx
 import { useState } from 'react';
-import './dashboard.css'; // Utilisation du CSS global
+import './SizeSlider.css'; // Utilisation du CSS global
 
 export default function SizeSlider({ onSizeChange }) {
   const [size, setSize] = useState(300); // valeur par défaut maximum (300 Mo)

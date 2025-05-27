@@ -1,0 +1,84 @@
+/* Topbar.css */
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  z-index: 1000;
+}
+/* changer la taille du Logo */
+.topbar-logo {
+  height: 38px;
+  cursor: pointer;
+}
+
+.topbar-left {
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.logo-bold {
+  color: #3498db;
+}
+
+.logo-light {
+  color: #2ecc71;
+}
+
+.topbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.topbar-btn {
+  background-color: transparent;
+  border: none;
+  color: #2c3e50;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.topbar-btn:hover,
+.topbar-btn.active {
+  color: #3498db;
+  font-weight: 600;
+}
+
+.topbar-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #2c3e50;
+}
+
+.topbar-icon:hover {
+  color: #3498db;
+}
+
+.topbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
