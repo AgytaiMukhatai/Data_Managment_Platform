@@ -1,0 +1,33 @@
+.like-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* border: 1px solid #000; */
+  /* border-radius: 39%; */
+  width: 90px;
+  height: 32px;
+  margin-left: 20px;
+}
+.like-count {
+  color: #2e3a59;
+  margin: 0;
+  width: 50%;
+  height: 100%;
+  justify-content: center;
+  text-align: center;
+  line-height: 32px;
+  border-top-left-radius: 35%;
+  border-bottom-left-radius: 35%;
+  border: 1px solid #000;
+}
+
+.like-icon {
+  width: 50%;
+  height: 100%;
+  justify-content: center;
+  text-align: center;
+  line-height: 35px;
+  border: 1px solid #000;
+  border-top-right-radius: 35%;
+  border-bottom-right-radius: 35%;
+}

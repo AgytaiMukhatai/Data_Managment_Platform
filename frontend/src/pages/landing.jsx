@@ -6,7 +6,7 @@ export default function Landing() {
     <div className="landing-page">
       <header className="header">
         <div className="logo">
-          <img src="/Images/LogoHub.png" alt="Logo" />
+          <img src="/Images/Logo2.svg" alt="Logo" />
         </div>
         <p className="intro-text">
           A platform to manage datasets, perform analytic, and integrate machine learning models

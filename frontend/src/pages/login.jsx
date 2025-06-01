@@ -27,7 +27,7 @@ export default function Login() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('access_token', data.access_token);  // Access Token
-        navigate('/dashboard');
+        navigate('/dashboard/dataset');
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'Incorrect email or password');
@@ -42,7 +42,7 @@ export default function Login() {
   return (
     <div className="login-page">
       <div className="login-container">
-        <img src="/Images/LogoHub.png" alt="Logo" className="login-logo" />
+        <img src="/Images/Logo2.svg" alt="Logo" className="login-logo" />
         <h2>Sign in</h2>
         <form className="login-form" onSubmit={handleLogin}>
           <input

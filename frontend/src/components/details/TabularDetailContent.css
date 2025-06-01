@@ -1,0 +1,353 @@
+.tabular-detail-container {
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  background-color: #F4F6F8;
+  color: #1e2a45;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.tabular-header {
+  width: 1050px;                        /* ✅ Largeur exacte Figma */
+  height: 58px;                        /* ✅ Hauteur exacte Figma */
+  margin-top: 30px;                   /* ✅ Distance par rapport à la Topbar */
+  margin-left:100px;                 /* ✅ Alignement horizontal comme sur le mockup */
+  /* background-color: #ffffff; */
+  /* border: 1px ;            */
+  /* border-radius: 6px; */
+  /* padding: 10px 20px; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tabular-header h1 {
+  font-size: 24px;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.tabular-header span {
+  font-size: 16px;
+  color: #6b7280;
+}
+
+.tabular-body {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 30px;
+}
+
+.tabular-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tabular-section.overview-box {
+  width: 1050px;
+  height: 271px;
+  margin-top: 30px;        /* ✅ espace vertical */
+  margin-left: 100px;       /* ✅ décalage depuis la gauche */
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.06);  /* ✅ flou et opacité de l’ombre */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.tabular-section.sample-box {
+  width: 1050px;
+  height: 525px;
+  margin-top: 30 px;     /* ✅ Marge haute pour positionner comme Figma */
+  margin-left: 100px;    /* ✅ Alignement horizontal */
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+.tabular-section.visualization-section {
+  width: 1050px;
+  height: 302px;
+  margin-top: -200px;     /* ✅ Position verticale */
+  margin-left: 100px;     /* ✅ Alignement horizontal */
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 40px;
+}
+
+
+
+
+.tabular-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #1e2a45;
+}
+
+.table-preview {
+  overflow-x: auto;
+  max-height: 300px;
+}
+
+.table-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table-preview th,
+.table-preview td {
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+  text-align: center;
+}
+
+.table-preview th {
+  background-color: #f3f4f6;
+  font-weight: 500;
+}
+
+.visualization-section {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  flex-wrap: nowrap;
+}
+
+/* .visualization-box {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  width: 350px;
+} */
+
+.visualization-box h4 {
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.tabular-download-btn {
+  width: 137px;
+  height: 36px;
+  /* margin: 40px 0 40px 175px; ✅ top-bottom 40px, left align to 175px */
+  background-color: #1e2a45;
+  margin-left: 100px;
+  color: white;
+  border: none;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.tabular-download-btn:hover {
+  background-color: #152030;
+}
+
+
+/* Right panel */
+.tabular-right {
+  display: flex;
+  flex-direction: column;
+  /* gap: 15px; */
+  padding-left: 0;
+  margin-left: 40px;
+}
+
+.metadata-box1,
+.tags-box,
+.dataexplorer-box,
+.downloads-box,
+.metadata-box2 {
+  /* background-color: white; */
+  padding: 15px;
+  /* border-radius: 8px; */
+  /* box-shadow: 0 1px 4 px rgba(0, 0, 0, 0.05); */
+  font-size: 16px;
+  margin-top: 7px;
+}
+
+.metadata-box1 {
+margin-top: -13px;
+}
+.tags-box {
+  margin-top: -10px;
+}
+.dataexplorer-box {
+  margin-top:20px;
+}
+.metadata-box2 {
+  margin-top: 360px;
+}
+.downloads-box {
+  margin-top: 10px;
+}
+.metadata-box1 h4,
+.tags-box h4,
+.dataexplorer-box h4,
+.downloads-box h4,
+.metadata-box2 h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1e2a45;
+}
+
+.tags-box .tag {
+  display: inline-block;
+  background-color: #3498db;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.dataexplorer-box label {
+  display: block;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+/* Datatable explorer */
+.dataexplorer-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  align-items: flex-start;       /* ✅ Pour empêcher l’étirement */
+  width: fit-content;            /* ✅ La box s’adapte à son contenu */
+}
+
+.dataexplorer-box h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1e2a45;
+}
+
+.dataexplorer-box button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border: 1px solid #ccc;
+  background-color: white;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #1e2a45;
+  transition: background-color 0.3s, color 0.3s;
+  width: fit-content;              /* ✅ Pas de 100% */
+  min-width: 120px;                /* (optionnel) pour que tous aient la même base */
+}
+
+.dataexplorer-box button.active {
+  background-color: #D9D9D9;
+  color: white;
+  border-color: #3498db;
+}
+
+.dataexplorer-box button:hover {
+  background-color: #f0f0f0;
+}
+
+.downloads-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;     /* Aligné à gauche */
+  gap: 60px;                       /* Contrôle la distance ici */
+  /* background-color: #ffffff; */
+  padding: 12px 16px;
+  /* border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05); */
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e2a45;
+}
+
+.download-label {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.download-count {
+  font-size: 18px;
+  font-weight: bold;
+}
+/* Bouton like   */
+.like-button {
+  background-color: white;
+  color: #abbcc9; /* bleu (par défaut) */
+  border: 2px solid #2E3A59;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+  padding: 5px 12px;
+  font-size: 20px;
+  transition: color 0.3s ease;
+}
+
+/* Quand c’est liké, le cœur devient rouge */
+.like-button.liked {
+  color:#2E3A59; 
+}
+
+/* === Visualization Section === */
+.tabular-section.visualization-section {
+  width: 1050px;
+  min-height: 320px;
+  margin-top: 30px;
+  margin-left: 100px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+.visualization-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.visualization-box {
+  flex: 1;
+  min-width: 300px;
+  max-width: 500px;
+  background-color: #ffffff;
+  padding: 20px;
+  /* border-radius: 8px; */
+  /* box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05); */
+  text-align: center;
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tabular-title {
+  display: flex;
+}
+
+.tabular-title > h1 {
+  margin: 0;
+}

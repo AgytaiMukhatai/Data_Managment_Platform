@@ -62,7 +62,7 @@ export default function Register() {
   return (
     <div className="register-page">
       <div className="register-container">
-        <img src="/Images/LogoHub.png" alt="Logo" className="register-logo" />
+        <img src="/Images/Logo2.svg" alt="Logo" className="register-logo" />
         <h2>Create Account</h2>
         <form className="register-form" onSubmit={handleSubmit}>
           <input

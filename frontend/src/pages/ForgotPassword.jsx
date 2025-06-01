@@ -37,7 +37,7 @@ export default function ForgotPassword() {
   return (
     <div className="forgot-password-page">
       <div className="forgot-password-container">
-        <img src="/Images/LogoHub.png" alt="Logo" className="login-logo" />
+        <img src="/Images/Logo2.svg" alt="Logo" className="login-logo" />
         <h2>Forgot Password</h2>
         <form className="forgot-password-form" onSubmit={handleForgotPassword}>
           <input

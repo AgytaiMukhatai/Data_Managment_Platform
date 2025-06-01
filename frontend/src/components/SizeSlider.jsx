@@ -14,15 +14,16 @@ export default function SizeSlider({ onSizeChange }) {
   return (
     <div className="size-slider-container">
       <label htmlFor="size-slider">Filter by Size (Max {size} MB)</label>
-      <input
-        type="range"
-        id="size-slider"
-        min="0"
-        max="300"
-        step="1"
-        value={size}
-        onChange={handleChange}
-      />
+     <input
+  type="range"
+  id="size-slider"
+  min="0"
+  max="300"
+  step="1"
+  value={size}
+  onChange={handleChange}
+  style={{background: `linear-gradient(to right, #3182B8 0%, #3182B8 ${size / 3}%, #ccc ${size / 3}%, #ccc 100%)`}}
+  />
     </div>
   );
-}
+  }
