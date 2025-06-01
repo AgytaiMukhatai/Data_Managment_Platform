@@ -1,14 +1,15 @@
 // src/components/ModalitiesFilter.jsx
 import './ModalitiesFilter.css';
-import { FaRegFileAlt, FaImage, FaPlay, FaVolumeUp, FaTable } from 'react-icons/fa';
+import { FaImage, FaPlay, FaVolumeUp, FaTable, FaAlignLeft, FaFileAlt } from 'react-icons/fa';
 
 export default function ModalitiesFilter({ onModalitySelect }) {
   const modalities = [
-    { label: "Text", value: "text", icon: <FaRegFileAlt /> },
+    { label: "Text", value: "text", icon: <FaAlignLeft /> },
     { label: "Image", value: "image", icon: <FaImage /> },
     { label: "Video", value: "video", icon: <FaPlay /> },
     { label: "Audio", value: "audio", icon: <FaVolumeUp /> },
     { label: "Tabular", value: "tabular", icon: <FaTable /> },
+    { label: "All", value: "all", icon: <FaFileAlt /> },
   ];
 
   return (

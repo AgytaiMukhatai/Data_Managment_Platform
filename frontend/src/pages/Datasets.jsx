@@ -9,7 +9,7 @@ import UploadModal from "../components/UploadModal";
 import Topbar from "../components/Topbar";
 
 export default function Datasets() {
-  const [selectedModality, setSelectedModality] = useState("All");
+  const [selectedModality, setSelectedModality] = useState("all");
   const [sizeRange, setSizeRange] = useState(300);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [datasets, setDatasets] = useState([]);
@@ -47,8 +47,8 @@ export default function Datasets() {
   const filteredDatasets = datasets
     .filter((dataset) => {
       const matchesModality =
-        selectedModality === "All" ||
-        dataset.dataset_type.toLowerCase() === selectedModality.toLowerCase();
+        selectedModality === "all" ||
+        dataset.dataset_type?.toLowerCase() === selectedModality;
       const matchesSize = parseFloat(dataset.size) <= sizeRange;
       return matchesModality && matchesSize;
     })
