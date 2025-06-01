@@ -18,7 +18,8 @@ export default function FilterDropdown({ onFilterChange }) {
         <option value="">Sort by...</option>
         <option value="most_downloaded">Most Downloaded</option>
         <option value="recently_created">Recently Created</option>
-        <option value="most_used">Most Used</option>
+        <option value="most_viewed">Most Viewed</option>
+        <option value="most_liked">Most Liked</option>
         <option value="smallest_size">Smallest Size</option>
         <option value="largest_size">Largest Size</option>
       </select>

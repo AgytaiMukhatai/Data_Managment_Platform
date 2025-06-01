@@ -1,5 +1,4 @@
-// src/pages/Datasets.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FilterDropdown from "../components/FilterDropdown";
 import ModalitiesFilter from "../components/ModalitiesFilter";
 import SizeSlider from "../components/SizeSlider";
@@ -10,10 +9,24 @@ import UploadModal from "../components/UploadModal";
 import Topbar from "../components/Topbar";
 
 export default function Datasets() {
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedModality, setSelectedModality] = useState("All");
   const [sizeRange, setSizeRange] = useState(300);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [datasets, setDatasets] = useState([]);
+  const [sortOption, setSortOption] = useState("");
+
+  useEffect(() => {
+    const fetchDatasets = () => {
+      fetch("http://localhost:8000/api/datasets/")
+        .then((res) => res.json())
+        .then((data) => setDatasets(data))
+        .catch((err) => console.error("Failed to fetch datasets:", err));
+    };
+
+    fetchDatasets();
+    const interval = setInterval(fetchDatasets, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleFilter = (modality) => {
     setSelectedModality(modality);
@@ -23,20 +36,40 @@ export default function Datasets() {
     setSizeRange(value);
   };
 
-  const handleUpload = (newDataset) => {
-    console.log("Uploaded dataset:", newDataset);
-    fetchDatasets(); // si tu as une fonction de chargement
+  const handleSortChange = (sort) => {
+    setSortOption(sort);
+  };
+
+  const handleUpload = () => {
     setIsUploadOpen(false);
   };
 
-  // const filteredDatasets = datasets.filter(dataset => {
-  //   const matchesSearch = dataset.title.toLowerCase().includes(searchQuery);
-  //   const matchesModality =
-  //     selectedModality === 'All' ||
-  //     dataset.type.toLowerCase().includes(selectedModality.toLowerCase());
-  //   const matchesSize = parseFloat(dataset.size) <= sizeRange;
-  //   return matchesSearch && matchesModality && matchesSize;
-  // });
+  const filteredDatasets = datasets
+    .filter((dataset) => {
+      const matchesModality =
+        selectedModality === "All" ||
+        dataset.dataset_type.toLowerCase() === selectedModality.toLowerCase();
+      const matchesSize = parseFloat(dataset.size) <= sizeRange;
+      return matchesModality && matchesSize;
+    })
+    .sort((a, b) => {
+      switch (sortOption) {
+        case "most_downloaded":
+          return b.downloads - a.downloads;
+        case "recently_created":
+          return new Date(b.created_at) - new Date(a.created_at);
+        case "most_viewed":
+          return b.views - a.views;
+        case "most_liked":
+          return b.likes - a.likes;
+        case "smallest_size":
+          return a.size - b.size;
+        case "largest_size":
+          return b.size - a.size;
+        default:
+          return 0;
+      }
+    });
 
   return (
     <div className="datasets-page">
@@ -46,16 +79,13 @@ export default function Datasets() {
           <ModalitiesFilter onModalitySelect={handleFilter} />
         </div>
         <div className="right-section">
-          <SizeSlider onChange={handleSizeChange} value={sizeRange} />
+          <SizeSlider onSizeChange={handleSizeChange} value={sizeRange} />
           <div className="upload-filter-row">
-            <button
-              className="upload-btn"
-              onClick={() => setIsUploadOpen(true)}
-            >
-              <FaUpload style={{ marginRight: "8px" }} />
+            <button className="upload-btn" onClick={() => setIsUploadOpen(true)}>
+              <FaUpload className="upload-icon" />
               Upload
             </button>
-            <FilterDropdown onFilterChange={handleFilter} />
+            <FilterDropdown onFilterChange={handleSortChange} />
           </div>
         </div>
       </div>
@@ -66,7 +96,7 @@ export default function Datasets() {
         onUpload={handleUpload}
       />
 
-      <DatasetList />
+      <DatasetList datasets={filteredDatasets} />
     </div>
   );
 }

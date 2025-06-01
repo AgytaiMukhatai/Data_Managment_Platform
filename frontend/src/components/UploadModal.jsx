@@ -1,7 +1,6 @@
- import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './UploadModal.css';
 import { FaUpload } from 'react-icons/fa';
-
 
 export default function UploadModal({ isOpen, onClose, onUpload }) {
   const [title, setTitle] = useState('');
@@ -9,19 +8,37 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const fileInputRef = useRef(null);
 
-  // Reset the error and success messages when the modal opens
   useEffect(() => {
     if (isOpen) {
       setError('');
       setSuccess('');
     }
-  }, [isOpen]); // This hook runs when 'isOpen' changes
+  }, [isOpen]);
+
+  const handleFileDrop = (e) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    setSelectedFiles((prev) => [...prev, ...files]);
+  };
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    setSelectedFiles((prev) => [...prev, ...files]);
+    e.target.value = null;
+  };
+
+  const handleRemoveFile = (indexToRemove) => {
+    setSelectedFiles((prevFiles) =>
+      prevFiles.filter((_, index) => index !== indexToRemove)
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');  // Clear previous errors
-    setSuccess(''); // Clear previous success messages
+    setError('');
+    setSuccess('');
 
     if (selectedFiles.length === 0) {
       setError('Please select at least one file.');
@@ -31,10 +48,8 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
-    selectedFiles.forEach((file) => {
-      formData.append('files', file);
-    });
-    formData.append('token', localStorage.getItem('access_token'))
+    selectedFiles.forEach((file) => formData.append('files', file));
+    formData.append('token', localStorage.getItem('access_token'));
 
     try {
       const response = await fetch('http://localhost:8000/api/upload-dataset/', {
@@ -43,14 +58,12 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
       });
 
       if (response.ok) {
-        const data = await response.json();
         setSuccess('Dataset uploaded successfully!');
         setTitle('');
         setDescription('');
         setSelectedFiles([]);
-        setTimeout(() => {onClose();}, 2000);
+        setTimeout(() => onClose(), 1000);
       } else {
-        // If response is not ok, get the error from the backend
         const errorData = await response.json();
         setError(errorData.error || 'Failed to upload dataset.');
       }
@@ -58,6 +71,15 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
       console.error('Upload error:', err);
       setError('Something went wrong. Please try again.');
     }
+  };
+
+  const handleClickDropArea = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleCancel = () => {
+    setSelectedFiles([]);
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -81,20 +103,46 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
             rows="3"
             required
           />
-          <input
-            type="file"
-            multiple
-            onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
-            required
-          />
+
+          <div
+            className="drop-area"
+            onClick={handleClickDropArea}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleFileDrop}
+          >
+            <p>Click or Drag & Drop files here</p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={handleFileSelect}
+              style={{ display: 'none' }}
+            />
+          </div>
+
+          {selectedFiles.length > 0 && (
+            <div className="file-previews">
+              {selectedFiles.map((file, index) => (
+                <div
+                  key={index}
+                  className="file-preview-button removable"
+                  title="Click to remove"
+                  onClick={() => handleRemoveFile(index)}
+                >
+                  {file.name}
+                </div>
+              ))}
+            </div>
+          )}
+
           {error && <p style={{ color: 'red' }}>{error}</p>}
           {success && <p style={{ color: 'green' }}>{success}</p>}
           <div className="modal-buttons">
-            <button type="button" className="cancel-btn" onClick={onClose}>
+            <button type="button" className="cancel-btn" onClick={handleCancel}>
               Cancel
             </button>
             <button type="submit" className="upload-btn">
-              <FaUpload style={{ marginRight: '8px' }} />
+              <FaUpload className="upload-icon" />
               Upload
             </button>
           </div>
