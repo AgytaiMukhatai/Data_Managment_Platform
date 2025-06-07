@@ -1,0 +1,23 @@
+# Environment files
+.env
+.env.prod
+.env.local
+.env.*
+datavenv/
+venv/
+env/
+
+# Database
+*.sqlite3
+
+# Media and static files
+media/
+staticfiles/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# macOS
+.DS_Store
