@@ -1,5 +1,8 @@
 from django.urls import path, include
 from .views import *
+from .dataset_views import *
+from .dataset_views import *
+
 app_name = 'api'
 urlpatterns = [
     path('register/', register_general_user, name='register'),

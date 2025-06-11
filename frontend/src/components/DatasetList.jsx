@@ -1,4 +1,3 @@
-// src/components/DatasetList.jsx
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -11,6 +10,7 @@ import {
   FaDownload,
   FaEye
 } from "react-icons/fa";
+import moment from 'moment';
 import "./DatasetList.css";
 
 export default function DatasetList({ datasets }) {
@@ -59,7 +59,7 @@ export default function DatasetList({ datasets }) {
               <div className="dataset-meta">
                 <span>{ds.size} MB</span>
                 <span>
-                  Uploaded {new Date(ds.created_at || ds.uploadDate).toLocaleDateString()}
+                  Uploaded: {moment(ds.created_at || ds.uploadDate).format('MMM DD, YYYY')}
                 </span>
                 <span
                   className="icon-meta"
