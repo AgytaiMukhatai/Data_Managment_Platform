@@ -15,7 +15,7 @@ from django.template.loader import render_to_string
 from django.shortcuts import render, redirect
 
 def send_verification_email(user):
-    verification_link = f'http://localhost:8000/api/verify-email/{user.verification_token}/'
+    verification_link = f'http://localhost/api/verify-email/{user.verification_token}/'
 
     subject = 'Email Verification'
     message = render_to_string('verification_email.html', {
@@ -32,7 +32,7 @@ def send_verification_email(user):
     )
 
 def send_password_email(user):
-    password_change_link = f'http://localhost:8000/api/password-change/{user.verification_token}/'
+    password_change_link = f'http://localhost/api/password-change/{user.verification_token}/'
 
     subject = 'Reset Password'
     message = render_to_string('forgot_password_email.html', {
@@ -86,11 +86,11 @@ def verify_email(request, token):
     try:
         user = GeneralUser.objects.get(verification_token=token)
         if user.is_active:
-            return redirect('http://localhost:5173/login?verified=true')
+            return redirect('http://localhost/login?verified=true')
         user.is_active = True
         user.save()
         # Redirect to a success page or render a template
-        return redirect('http://localhost:5173/login?verified=true')
+        return redirect('http://localhost/login?verified=true')
     except GeneralUser.MultipleObjectsReturned:
         # Handle the case where multiple users are found with the same token
         return Response({'message': 'Multiple users found with this token'}, status=400)

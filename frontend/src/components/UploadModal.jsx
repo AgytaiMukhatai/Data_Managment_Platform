@@ -52,7 +52,7 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
     formData.append('token', localStorage.getItem('access_token'));
 
     try {
-      const response = await fetch('http://localhost:8000/api/upload-dataset/', {
+      const response = await fetch('http://localhost/api/upload-dataset/', {
         method: 'POST',
         body: formData,
       });

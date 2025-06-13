@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaSearch } from 'react-icons/fa';
-import './Searchbar.css';
+import './SearchBar.css';
 
 export default function SearchBar({ onSearch }) {
   const [query, setQuery] = useState('');
@@ -16,7 +16,7 @@ export default function SearchBar({ onSearch }) {
       return;
     }
     try {
-      const response = await fetch('http://localhost:8000/api/search/', {
+      const response = await fetch('http://localhost/api/search/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
