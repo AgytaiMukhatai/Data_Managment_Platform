@@ -6,16 +6,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=${DB_NAME:-DMP}
-      - POSTGRES_USER=${DB_USER:-postgres}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-datamanagement_2025}
+      POSTGRES_DB: ${DB_NAME:-DMP}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-datamanagement_2025}
     ports:
-      - "5432:5432"
+      - "5432:5432"  # Remove if you don't want DB exposed
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   backend:
     env_file:
@@ -31,34 +32,34 @@ services:
       - ./backend:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     depends_on:
       db:
         condition: service_healthy
     environment:
-      - DEBUG=${DEBUG:-False}
-      - SECRET_KEY=${SECRET_KEY}
-      - DATABASE_NAME=${DB_NAME:-DMP}
-      - DATABASE_USER=${DB_USER:-postgres}
-      - DATABASE_PASSWORD=${DB_PASSWORD:-datamanagement_2025}
-      - DATABASE_HOST=db
-      - DATABASE_PORT=5432
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
-      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
-      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      DEBUG: ${DEBUG:-False}
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_NAME: ${DB_NAME:-DMP}
+      DATABASE_USER: ${DB_USER:-postgres}
+      DATABASE_PASSWORD: ${DB_PASSWORD:-datamanagement_2025}
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
     restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    ports:
-      - "3000:80"
+    volumes:
+      - frontend_build:/app/build
     depends_on:
       - backend
     environment:
-      - REACT_APP_API_URL=${API_URL:-http://localhost/api}
+      REACT_APP_API_URL: ${API_URL:-http://localhost/api}
     restart: unless-stopped
 
   nginx:
@@ -66,11 +67,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - static_volume:/app/staticfiles:ro
-      - media_volume:/app/media:ro
-      - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - backend
       - frontend
@@ -80,3 +76,4 @@ volumes:
   postgres_data:
   static_volume:
   media_volume:
+  frontend_build:
