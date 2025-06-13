@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import './UploadModal.css';
 import { FaUpload } from 'react-icons/fa';
 
-export default function UploadModal({ isOpen, onClose, onUpload }) {
+export default function UploadModal({ isOpen, onClose}) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -52,7 +52,7 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
     formData.append('token', localStorage.getItem('access_token'));
 
     try {
-      const response = await fetch('http://localhost:8000/api/upload-dataset/', {
+      const response = await fetch('http://192.168.64.112/api/upload-dataset/', {
         method: 'POST',
         body: formData,
       });

@@ -15,7 +15,7 @@ from django.template.loader import render_to_string
 from django.shortcuts import render, redirect
 
 def send_verification_email(user):
-    verification_link = f'http://localhost:8000/api/verify-email/{user.verification_token}/'
+    verification_link = f'http://192.168.64.112/api/verify-email/{user.verification_token}/'
 
     subject = 'Email Verification'
     message = render_to_string('verification_email.html', {
@@ -32,7 +32,7 @@ def send_verification_email(user):
     )
 
 def send_password_email(user):
-    password_change_link = f'http://localhost:8000/api/password-change/{user.verification_token}/'
+    password_change_link = f'http://192.168.64.112/api/password-change/{user.verification_token}/'
 
     subject = 'Reset Password'
     message = render_to_string('forgot_password_email.html', {

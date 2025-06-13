@@ -17,7 +17,7 @@ export default function Datasets() {
 
   useEffect(() => {
     const fetchDatasets = () => {
-      fetch("http://localhost:8000/api/datasets/")
+      fetch("http://192.168.64.112/api/datasets/")
         .then((res) => res.json())
         .then((data) => setDatasets(data))
         .catch((err) => console.error("Failed to fetch datasets:", err));
