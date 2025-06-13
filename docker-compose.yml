@@ -54,8 +54,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    volumes:
-      - frontend_build:/app/build
     depends_on:
       - backend
     environment:
@@ -76,4 +74,3 @@ volumes:
   postgres_data:
   static_volume:
   media_volume:
-  frontend_build:
