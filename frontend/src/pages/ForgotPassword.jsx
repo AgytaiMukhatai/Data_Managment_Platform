@@ -14,7 +14,7 @@ export default function ForgotPassword() {
     setSuccessMessage('');
 
     try {
-      const response = await fetch('http://localhost/api/forgot_password/', {
+      const response = await fetch('http://localhost:8000/api/forgot_password/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

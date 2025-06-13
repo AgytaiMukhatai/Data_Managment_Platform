@@ -16,7 +16,7 @@ export default function SearchBar({ onSearch }) {
       return;
     }
     try {
-      const response = await fetch('http://localhost/api/search/', {
+      const response = await fetch('http://localhost:8000/api/search/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
