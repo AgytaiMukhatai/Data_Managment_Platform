@@ -167,7 +167,11 @@ EMAIL_HOST_PASSWORD = 'qpvs brer ivpf viad'
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = ['authorization', 'content-type']
 
-import sys
+ALLOWED_HOSTS = [
+    '192.168.64.112',
+    'localhost',
+    '127.0.0.1',
+]
 
 if 'test' in sys.argv:
     DATABASES = {
